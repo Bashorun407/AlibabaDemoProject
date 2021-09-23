@@ -75,7 +75,7 @@ public class ProductService2 {
         return responsePojo;
     }
 
-    //(5) Update product
+    //(2) Update product
     public ResponsePojo<Product> productUpdate(ProductDto productDto){
 
         if(ObjectUtils.isEmpty(productDto.getId()))
@@ -135,7 +135,7 @@ public class ProductService2 {
     }
 
 
-    //(2) Method to search for product with the following arguments
+    //(3) Method to search for product with the following arguments
     public ResponsePojo<Page<Product>> search(String productName, String companyName, Long productNumber, Pageable pageable){
 
         QProduct qProduct = QProduct.product;
@@ -170,7 +170,7 @@ public class ProductService2 {
     }
 
 
-    //The methods stated here are to engage, input and increment certain features of the Product table
+    //(4) The methods stated here are to engage, input and increment certain features of the Product table
     public ResponsePojo<Long> clientTransaction(Long Id, Long numberOrdered){
 
         if(ObjectUtils.isEmpty(Id))
@@ -193,7 +193,7 @@ public class ProductService2 {
         return responsePojo;
     }
 
-    //(6) Method to remove product
+    //(5) Method to remove product
     public void removeProduct(Long Id){
         Optional<Product> productOptional = productReppo.findById(Id);
         productOptional.orElseThrow(()-> new ApiException(String.format("Product with this Id %s not found!!", Id)));
