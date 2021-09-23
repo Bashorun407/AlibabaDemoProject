@@ -231,7 +231,7 @@ public class ProductService {
 
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(predicate.and(qProduct.saleStatus.eq(true).and(qProduct.ratings.between(80, 100))))
+                .where(predicate.and(qProduct.saleStatus.eq(true).and(qProduct.ratings.gt(20))))
                 .orderBy(qProduct.reviews.desc());
 
         List<Product> productList = jpaQuery.fetch();
@@ -1044,3 +1044,4 @@ public class ProductService {
 
 
 }
+

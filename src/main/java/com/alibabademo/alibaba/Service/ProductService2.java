@@ -193,12 +193,28 @@ public class ProductService2 {
         return responsePojo;
     }
 
-    //(5) Method to remove product
+    //(5) Method to Customize Product
+    public ResponsePojo<Product> customizeProduct(Long Id){
+        Optional<Product> productOptional = productReppo.findById(Id);
+        productOptional.orElseThrow(()->new ApiException(String.format("Product with this Id %s not found!", Id)));
+        Product product = productOptional.get();
+        product.setCustomized(true);
+
+        productReppo.save(product);
+        ResponsePojo<Product> responsePojo = new ResponsePojo<>();
+        responsePojo.setData(product);
+        responsePojo.setMessage("Product is Customized!");
+
+        return responsePojo;
+    }
+
+    //(6) Method to remove product
     public void removeProduct(Long Id){
         Optional<Product> productOptional = productReppo.findById(Id);
         productOptional.orElseThrow(()-> new ApiException(String.format("Product with this Id %s not found!!", Id)));
 
         productReppo.deleteById(Id);
     }
+
 
 }

@@ -7,8 +7,7 @@ import com.alibabademo.alibaba.Service.ProductService2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/alibaba")
@@ -18,27 +17,41 @@ public class ProductApi2 {
     private ProductService2 productService2;
 
     //(1) Method to create a product
-    public ResponsePojo<Product> createProduct(ProductDto productDto){
+    @PostMapping("/createProduct")
+    public ResponsePojo<Product> createProduct(@RequestBody ProductDto productDto){
         return productService2.createProduct(productDto);
     }
 
     //(2) Update product
-    public ResponsePojo<Product> productUpdate(ProductDto productDto){
+    @PutMapping("/updateProduct")
+    public ResponsePojo<Product> productUpdate(@RequestBody ProductDto productDto){
         return productService2.productUpdate(productDto);
     }
 
     //(3) Method to search for product with the following arguments
-    public ResponsePojo<Page<Product>> search(String productName, String companyName, Long productNumber, Pageable pageable){
+    @GetMapping("/search")
+    public ResponsePojo<Page<Product>> search(@RequestParam(name = "productName", required = false) String productName,
+                                              @RequestParam(name = "companyName", required = false) String companyName,
+                                              @RequestParam(name = "productNumber", required = false) Long productNumber,
+                                              Pageable pageable){
         return productService2.search(productName, companyName, productNumber, pageable);
     }
 
     //(4) The methods stated here are to engage, input and increment certain features of the Product table
-    public ResponsePojo<Long> clientTransaction(Long Id, Long numberOrdered){
+    @PutMapping("/clientTransaction/{Id}")
+    public ResponsePojo<Long> clientTransaction(@PathVariable Long Id, Long numberOrdered){
         return  productService2.clientTransaction(Id, numberOrdered);
     }
 
-    //(5) Method to remove product
-    public void removeProduct(Long Id){
+    //(5) Method to Customize Product
+    @PutMapping("/customizeProduct/{Id}")
+    public ResponsePojo<Product> customizeProduct(@PathVariable Long Id){
+        return productService2.customizeProduct(Id);
+    }
+
+    //(6) Method to remove product
+    @DeleteMapping("/deleteProduct/{Id}")
+    public void removeProduct(@PathVariable Long Id){
          productService2.removeProduct(Id);
     }
 
