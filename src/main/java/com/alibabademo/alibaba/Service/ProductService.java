@@ -1,8 +1,9 @@
 package com.alibabademo.alibaba.Service;
 
-import com.alibabademo.alibaba.Dao.ProductDto;
 import com.alibabademo.alibaba.Entity.Product;
+
 import com.alibabademo.alibaba.Entity.QProduct;
+import com.alibabademo.alibaba.Entity.QProductTransaction;
 import com.alibabademo.alibaba.Exception.ApiException;
 import com.alibabademo.alibaba.Repository.ProductReppo;
 import com.alibabademo.alibaba.RestResponse.ResponsePojo;
@@ -10,16 +11,11 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Id;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -127,123 +123,76 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(6) Method to get New Arrivals
-    public ResponsePojo<List<Product>> newArrivals(){
-        QProduct qProduct = QProduct.product;
-        //BooleanBuilder predicate = new BooleanBuilder();
+        //(6) Method to get products by category
+    public ResponsePojo<List<Product>> getToysAndHobbies(String searchItem, String type){
 
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(qProduct.productName.isNotNull())//I need to use time function to specify time & date range
-                .orderBy(qProduct.timeListed.desc());
-
-        List<Product> productList = jpaQuery.fetch();
-
-        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(productList);
-        responsePojo.setMessage("New Arrivals");
-
-        return responsePojo;
-    }
-
-    //(7) Method to get Ready-To-Ship Products
-    public ResponsePojo<List<Product>> readyToShipProducts(){
-        QProduct qProduct = QProduct.product;
-        //BooleanBuilder predicate = new BooleanBuilder();
-
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(qProduct.saleStatus.eq(true))
-                .orderBy(qProduct.dateSold.desc());
-
-        List<Product> productList = jpaQuery.fetch();
-
-        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(productList);
-        responsePojo.setMessage("Ready To Ship");
-
-        return responsePojo;
-    }
-
-    //(8) Method to get Weekly Deals
-    public ResponsePojo<List<Product>> weeklyDeals(){
-        QProduct qProduct = QProduct.product;
-        //BooleanBuilder predicate = new BooleanBuilder();
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(qProduct.saleStatus.eq(true).and(qProduct.dateSold.gt(qProduct.dateListed)))
-                .orderBy(qProduct.quantityOrdered.asc());
-
-        List<Product> productList = jpaQuery.fetch();
-
-        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(productList);
-        responsePojo.setMessage("Weekly Deals");
-
-        return responsePojo;
-    }
-
-    //(9) Method to get small Commodities products
-    public ResponsePojo<List<Product>> smallCommodities(){
-        QProduct qProduct = QProduct.product;
-        //BooleanBuilder predicate = new BooleanBuilder();
-
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(qProduct.quantityOrdered.between(1, 10).and(qProduct.price.between(1000,3000)))
-                .orderBy(qProduct.saleStatus.asc());
-
-        List<Product> productList = jpaQuery.fetch();
-
-        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(productList);
-        responsePojo.setMessage("Small Commodities");
-
-        return responsePojo;
-    }
-
-    //(10) Method to get Top Ranking Products
-    public ResponsePojo<List<Product>> topRankingProducts(){
-        QProduct qProduct = QProduct.product;
-        //BooleanBuilder predicate = new BooleanBuilder();
-
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(qProduct.ratings.between(80, 100))
-                .orderBy(qProduct.reviews.desc());
-
-        List<Product> productList = jpaQuery.fetch();
-
-        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(productList);
-        responsePojo.setMessage("Top Ranking Products");
-
-        return responsePojo;
-    }
-
-    //(11) Method to get top products by a company
-    public ResponsePojo<List<Product>> topProductsByCompany(String companyName){
         QProduct qProduct = QProduct.product;
         BooleanBuilder predicate = new BooleanBuilder();
-
-        if(StringUtils.hasText(companyName))
-            predicate.and(qProduct.companyName.likeIgnoreCase("%" + companyName + "%"));
+        if(StringUtils.hasText(searchItem))
+            predicate.and(qProduct.category.likeIgnoreCase(searchItem));
 
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(predicate.and(qProduct.saleStatus.eq(true).and(qProduct.ratings.gt(20))))
-                .orderBy(qProduct.reviews.desc());
+                .where(predicate.and(qProduct.productType.likeIgnoreCase(type)))
+                .orderBy(qProduct.price.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
         ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
         responsePojo.setData(productList);
-        responsePojo.setMessage("Top Products by Company");
+        responsePojo.setMessage("Toys and Hobbies");
 
         return responsePojo;
     }
 
-    //(12) Method to get products by category
+
+    //(7) Method to get products by category
+    public ResponsePojo<List<Product>> getFashionAccessories(String searchItem, String type){
+
+        QProduct qProduct = QProduct.product;
+        BooleanBuilder predicate = new BooleanBuilder();
+        if(StringUtils.hasText(searchItem))
+            predicate.and(qProduct.category.likeIgnoreCase("%" + searchItem + "%"));
+
+        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
+        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
+                .where(predicate.and(qProduct.productType.likeIgnoreCase(type)))
+                .orderBy(qProduct.availableQuantity.desc());
+
+        List<Product> productList = jpaQuery.fetch();
+
+        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
+        responsePojo.setData(productList);
+        responsePojo.setMessage("Fashion Accessories");
+
+        return responsePojo;
+    }
+
+    //(8) Method to get products by category
+    public ResponsePojo<List<Product>> getBeautyAndPersonalCare(String searchItem, String type){
+
+        QProduct qProduct = QProduct.product;
+        BooleanBuilder predicate = new BooleanBuilder();
+        if(StringUtils.hasText(searchItem))
+            predicate.and(qProduct.category.likeIgnoreCase("%" + searchItem + "%"));
+
+        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
+        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
+                .where(predicate.and(qProduct.productType.likeIgnoreCase(type)))
+                .orderBy(qProduct.availableQuantity.desc());
+
+        List<Product> productList = jpaQuery.fetch();
+
+        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
+        responsePojo.setData(productList);
+        responsePojo.setMessage("Beauty and Personal Care");
+
+        return responsePojo;
+    }
+
+
+
+    //(9) Method to get products by category
     public ResponsePojo<List<Product>> getConsumerElectronics(String searchItem, String type){
 
         QProduct qProduct = QProduct.product;
@@ -265,7 +214,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(13) Method to get products by category
+    //(10) Method to get products by category
     public ResponsePojo<List<Product>> getApparel(String apparel, String type){
 
         QProduct qProduct = QProduct.product;
@@ -287,7 +236,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(14) Method to get products by category
+    //(11) Method to get products by category
     public ResponsePojo<List<Product>> getSportsAndEntertainment(String searchItem, String type){
 
         QProduct qProduct = QProduct.product;
@@ -309,7 +258,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(15) Method to get products by category
+    //(12) Method to get products by category
     public ResponsePojo<List<Product>> getTimepieces(String timePieces, String jewelry, String eyewears){
 
         QProduct qProduct = QProduct.product;
@@ -337,7 +286,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(16) Method to get products by category
+    //(13) Method to get products by category
     public ResponsePojo<List<Product>> getHomeAndGarden(String searchItem, String type){
 
         QProduct qProduct = QProduct.product;
@@ -359,51 +308,8 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(17) Method to get products by category
-    public ResponsePojo<List<Product>> getFashionAccessories(String searchItem, String type){
 
-        QProduct qProduct = QProduct.product;
-        BooleanBuilder predicate = new BooleanBuilder();
-        if(StringUtils.hasText(searchItem))
-            predicate.and(qProduct.category.likeIgnoreCase("%" + searchItem + "%"));
-
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(predicate.and(qProduct.productType.likeIgnoreCase(type)))
-                .orderBy(qProduct.quantityOrdered.desc());
-
-        List<Product> productList = jpaQuery.fetch();
-
-        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(productList);
-        responsePojo.setMessage("Fashion Accessories");
-
-        return responsePojo;
-    }
-
-    //(18) Method to get products by category
-    public ResponsePojo<List<Product>> getBeautyAndPersonalCare(String searchItem, String type){
-
-        QProduct qProduct = QProduct.product;
-        BooleanBuilder predicate = new BooleanBuilder();
-        if(StringUtils.hasText(searchItem))
-            predicate.and(qProduct.category.likeIgnoreCase("%" + searchItem + "%"));
-
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(predicate.and(qProduct.productType.likeIgnoreCase(type)))
-                .orderBy(qProduct.quantityOrdered.desc());
-
-        List<Product> productList = jpaQuery.fetch();
-
-        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(productList);
-        responsePojo.setMessage("Beauty and Personal Care");
-
-        return responsePojo;
-    }
-
-    //(19) Method to get products by category
+    //(14) Method to get products by category
     public ResponsePojo<List<Product>> getMenWear(String searchWord){
 
         QProduct qProduct = QProduct.product;
@@ -425,7 +331,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(20) Method to get products by category
+    //(15) Method to get products by category
     public ResponsePojo<List<Product>> getWomenWear(String searchWord){
 
         QProduct qProduct = QProduct.product;
@@ -447,7 +353,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(21) Method to get products by category
+    //(16) Method to get products by category
     public ResponsePojo<List<Product>> getChildrenWear(String searchWord){
 
         QProduct qProduct = QProduct.product;
@@ -469,7 +375,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(22) Method to get products by category
+    //(17) Method to get products by category
     public ResponsePojo<List<Product>> getPPE(String searchItem){
 
         QProduct qProduct = QProduct.product;
@@ -480,7 +386,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate)
-                .orderBy(qProduct.totalCost.asc());
+                .orderBy(qProduct.availableQuantity.asc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -491,7 +397,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(23) Method to get products by category
+    //(18) Method to get products by category
     public ResponsePojo<List<Product>> getDisinfectants(String disinfectants){
 
         QProduct qProduct = QProduct.product;
@@ -502,7 +408,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate)
-                .orderBy(qProduct.totalCost.desc());
+                .orderBy(qProduct.availableQuantity.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -513,7 +419,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(24) Method to get products by category
+    //(19) Method to get products by category
     public ResponsePojo<List<Product>> getMedicalDevices(String medicalDevices){
 
         QProduct qProduct = QProduct.product;
@@ -524,7 +430,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate)
-                .orderBy(qProduct.totalCost.desc());
+                .orderBy(qProduct.availableQuantity.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -535,7 +441,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(25) Method to get products by category
+    //(20) Method to get products by category
     public ResponsePojo<List<Product>> getMedicalConsumables(String medicalConsumables){
 
         QProduct qProduct = QProduct.product;
@@ -546,7 +452,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate)
-                .orderBy(qProduct.totalCost.desc());
+                .orderBy(qProduct.availableQuantity.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -557,7 +463,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(26) Method to get products by category
+    //(21) Method to get products by category
     public ResponsePojo<List<Product>> getHomeAppliances(String homeAppliances){
 
         QProduct qProduct = QProduct.product;
@@ -568,7 +474,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate)
-                .orderBy(qProduct.totalCost.desc());
+                .orderBy(qProduct.availableQuantity.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -579,7 +485,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(27) Method to get products by category
+    //(22) Method to get products by category
     public ResponsePojo<List<Product>> getLightning(String searchItem){
 
         QProduct qProduct = QProduct.product;
@@ -601,7 +507,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(28) Method to get products by category
+    //(23) Method to get products by category
     public ResponsePojo<List<Product>> getConstruction(String searchItem, String type){
 
         QProduct qProduct = QProduct.product;
@@ -612,7 +518,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate.and(qProduct.productType.likeIgnoreCase(type)))
-                .orderBy(qProduct.totalCost.desc());
+                .orderBy(qProduct.price.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -623,7 +529,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(29) Method to get products by category
+    //(24) Method to get products by category
     public ResponsePojo<List<Product>> getRealEstate(String searchItem, String type){
 
         QProduct qProduct = QProduct.product;
@@ -634,7 +540,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate.and(qProduct.productType.likeIgnoreCase(type)))
-                .orderBy(qProduct.totalCost.desc());
+                .orderBy(qProduct.price.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -645,7 +551,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(30) Method to get products by category
+    //(25) Method to get products by category
     public ResponsePojo<List<Product>> getFabricTextile(String searchItem, String type){
 
         QProduct qProduct = QProduct.product;
@@ -667,7 +573,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(31) Method to get products by category
+    //(26) Method to get products by category
     public ResponsePojo<List<Product>> getHomeAppliances(String searchItem, String type){
 
         QProduct qProduct = QProduct.product;
@@ -678,7 +584,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate.and(qProduct.productType.likeIgnoreCase(type)))
-                .orderBy(qProduct.totalCost.desc());
+                .orderBy(qProduct.Id.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -689,7 +595,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(32) Method to get products by category
+    //(27) Method to get products by category
     public ResponsePojo<List<Product>> getPackagingAndPrinting(String searchItem, String type){
 
         QProduct qProduct = QProduct.product;
@@ -700,7 +606,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate.and(qProduct.productType.likeIgnoreCase(type)))
-                .orderBy(qProduct.totalCost.desc());
+                .orderBy(qProduct.Id.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -711,7 +617,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(33) Method to get products by category
+    //(28) Method to get products by category
     public ResponsePojo<List<Product>> getOfficeAndSchoolSupplies(String searchItem, String type){
 
         QProduct qProduct = QProduct.product;
@@ -722,7 +628,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate.and(qProduct.productType.likeIgnoreCase(type)))
-                .orderBy(qProduct.totalCost.desc());
+                .orderBy(qProduct.Id.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -733,7 +639,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(34) Method to get products by category
+    //(29) Method to get products by category
     public ResponsePojo<List<Product>> getElectricalEquipments(String searchItem, String type){
 
         QProduct qProduct = QProduct.product;
@@ -744,7 +650,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate.and(qProduct.productType.likeIgnoreCase(type)))
-                .orderBy(qProduct.totalCost.desc());
+                .orderBy(qProduct.Id.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -755,139 +661,8 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(35) Method to get products by category
-    public ResponsePojo<List<Product>> getProductDiscounts(String searchItem){
 
-        QProduct qProduct = QProduct.product;
-        BooleanBuilder predicate = new BooleanBuilder();
-        if(StringUtils.hasText(searchItem))
-            predicate.and(qProduct.discount.between(1, 15));
-
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(predicate)
-                .orderBy(qProduct.totalCost.desc());
-
-        List<Product> productList = jpaQuery.fetch();
-
-        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(productList);
-        responsePojo.setMessage("Product Discounts");
-
-        return responsePojo;
-    }
-
-    //(36) Method to get products by category
-    public ResponsePojo<List<Product>> getShippingDiscounts(String searchItem){
-
-        QProduct qProduct = QProduct.product;
-        BooleanBuilder predicate = new BooleanBuilder();
-        if(StringUtils.hasText(searchItem))
-            predicate.and(qProduct.shippingDiscount.between(5, 15));
-
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(predicate)
-                .orderBy(qProduct.totalCost.desc());
-
-        List<Product> productList = jpaQuery.fetch();
-
-        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(productList);
-        responsePojo.setMessage("Shipping Discounts");
-
-        return responsePojo;
-    }
-
-    //(37) Method to get products by category
-    public ResponsePojo<List<Product>> getTrendingProducts(String searchItem){
-
-        QProduct qProduct = QProduct.product;
-        BooleanBuilder predicate = new BooleanBuilder();
-        if(StringUtils.hasText(searchItem))
-            predicate.and(qProduct.ratings.between(70, 100));
-
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(predicate.and(qProduct.reviews.gt(100)))
-                .orderBy(qProduct.quantityOrdered.desc());
-
-        List<Product> productList = jpaQuery.fetch();
-
-        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(productList);
-        responsePojo.setMessage("Trending Products");
-
-        return responsePojo;
-    }
-
-    //(38) Method to get products by category
-    public ResponsePojo<List<Product>> getProductsAndShippingSavings(String searchItem){
-
-        QProduct qProduct = QProduct.product;
-        BooleanBuilder predicate = new BooleanBuilder();
-        if(StringUtils.hasText(searchItem))
-            predicate.and(qProduct.shippingDiscount.between(10, 20));
-
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(predicate)
-                .orderBy(qProduct.totalCost.desc());
-
-        List<Product> productList = jpaQuery.fetch();
-
-        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(productList);
-        responsePojo.setMessage("Product and Shipping savings");
-
-        return responsePojo;
-    }
-
-    //(39) Method to get products by category
-    public ResponsePojo<List<Product>> getToysAndHobbies(String searchItem, String type){
-
-        QProduct qProduct = QProduct.product;
-        BooleanBuilder predicate = new BooleanBuilder();
-        if(StringUtils.hasText(searchItem))
-            predicate.and(qProduct.category.likeIgnoreCase(searchItem));
-
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(predicate.and(qProduct.productType.likeIgnoreCase(type)))
-                .orderBy(qProduct.price.desc());
-
-        List<Product> productList = jpaQuery.fetch();
-
-        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(productList);
-        responsePojo.setMessage("Toys and Hobbies");
-
-        return responsePojo;
-    }
-
-    //(40) Method to get products by category
-    public ResponsePojo<List<Product>> getReadyToShip(String searchItem){
-
-        QProduct qProduct = QProduct.product;
-        BooleanBuilder predicate = new BooleanBuilder();
-        if(StringUtils.hasText(searchItem))
-            predicate.and(qProduct.saleStatus.eq(true));
-
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(predicate.and(qProduct.dateSold.gt(qProduct.dateListed)))
-                .orderBy(qProduct.quantityOrdered.desc());//I need to use a Date function which I can use to select day intervals
-
-        List<Product> productList = jpaQuery.fetch();
-
-        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(productList);
-        responsePojo.setMessage("Ready To Ship Between 7 Days");
-
-        return responsePojo;
-    }
-
-    //(41) Method to get products by category
+    //(30) Method to get products by category
     public ResponsePojo<List<Product>> getHygieneProducts(String searchItem){
 
         QProduct qProduct = QProduct.product;
@@ -898,7 +673,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate)
-                .orderBy(qProduct.price.desc());
+                .orderBy(qProduct.Id.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -909,7 +684,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(42) Method to get products by category
+    //(31) Method to get products by category
     public ResponsePojo<List<Product>> getFragranceDeodorant(String searchItem){
 
         QProduct qProduct = QProduct.product;
@@ -921,7 +696,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate)
-                .orderBy(qProduct.totalCost.desc());
+                .orderBy(qProduct.Id.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -932,7 +707,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(43) Method to get products by category
+    //(32) Method to get products by category
     public ResponsePojo<List<Product>> getPersonalHygieneProducts(String searchWord){
 
         QProduct qProduct = QProduct.product;
@@ -943,7 +718,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate)
-                .orderBy(qProduct.price.desc());
+                .orderBy(qProduct.Id.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -954,7 +729,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(44) Method to get products by category
+    //(33) Method to get products by category
     public ResponsePojo<List<Product>> getBathroomProducts(String searchWord){
 
         QProduct qProduct = QProduct.product;
@@ -965,7 +740,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate)
-                .orderBy(qProduct.price.desc());
+                .orderBy(qProduct.Id.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -976,7 +751,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(45) Method to get products by category
+    //(34) Method to get products by category
     public ResponsePojo<List<Product>> getHomeDecor(String searchWord){
 
         QProduct qProduct = QProduct.product;
@@ -987,7 +762,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate)
-                .orderBy(qProduct.price.desc());
+                .orderBy(qProduct.Id.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -998,7 +773,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(46) Method to get products by category
+    //(35) Method to get products by category
     public ResponsePojo<List<Product>> getHomeStorage(String searchWord){
 
         QProduct qProduct = QProduct.product;
@@ -1009,7 +784,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate)
-                .orderBy(qProduct.price.desc());
+                .orderBy(qProduct.Id.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -1020,7 +795,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(47) Method to get products by category
+    //(36) Method to get products by category
     public ResponsePojo<List<Product>> getHouseholdCleaningTools(String searchWord){
 
         QProduct qProduct = QProduct.product;
@@ -1031,7 +806,7 @@ public class ProductService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
                 .where(predicate)
-                .orderBy(qProduct.price.desc());
+                .orderBy(qProduct.Id.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -1042,6 +817,71 @@ public class ProductService {
         return responsePojo;
     }
 
+    //(6) Method to get New Arrivals
+    //***This API is not fully developed with its required features***
+    public ResponsePojo<List<Product>> newArrivals(){
+        QProduct qProduct = QProduct.product;
+       // BooleanBuilder predicate = new BooleanBuilder();
+
+        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
+        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
+                .where(qProduct.dateListed.after(qProduct.dateListed));//this is not exactly how  I want this represented!!
+
+        List<Product> productList = jpaQuery.fetch();
+
+        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
+        responsePojo.setData(productList);
+        responsePojo.setMessage("new Arrivals");
+
+        return responsePojo;
+
+    }
+
+    //(9) Method to get small Commodities products
+    public ResponsePojo<List<Product>> smallCommodities(){
+
+        QProduct qProduct = QProduct.product;
+        // BooleanBuilder predicate = new BooleanBuilder();
+
+        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
+        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
+                .where(qProduct.price.min().between(100, 200).and(qProduct.availableQuantity.between(10, 50)));//this is not exactly how  I want this represented!!
+
+        List<Product> productList = jpaQuery.fetch();
+
+        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
+        responsePojo.setData(productList);
+        responsePojo.setMessage("Small Commodities");
+
+        return responsePojo;
+
+    }
+
+    //(5) Method to get products by category
+    public ResponsePojo<List<Product>> getProductDiscounts(String searchItem){
+
+        QProduct qProduct = QProduct.product;
+        BooleanBuilder predicate = new BooleanBuilder();
+        if(StringUtils.hasText(searchItem))
+            predicate.and(qProduct.discount.between(1, 15));
+
+        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
+        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
+                .where(predicate)
+                .orderBy(qProduct.discount.desc());
+
+        List<Product> productList = jpaQuery.fetch();
+
+        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
+        responsePojo.setData(productList);
+        responsePojo.setMessage("Product Discounts");
+
+        return responsePojo;
+    }
+
 
 }
+
+
+
 

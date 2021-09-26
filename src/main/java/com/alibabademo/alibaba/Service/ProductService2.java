@@ -49,23 +49,7 @@ public class ProductService2 {
         product.setDescription(productDto.getDescription());
         product.setPrice(productDto.getPrice());
         product.setAvailableQuantity(productDto.getAvailableQuantity());
-        product.setShippingCharge(productDto.getShippingCharge());
-        product.setTotalCost((productDto.getPrice()) * (productDto.getAvailableQuantity()));
-        product.setDiscount(productDto.getDiscount());
-        product.setActualAmount((productDto.getTotalCost()) - (productDto.getTotalCost() * (productDto.getDiscount()/100)));
-        product.setShippingCharge(productDto.getShippingCharge());
-        product.setShippingDiscount(productDto.getShippingDiscount());
-        product.setShippingCost((productDto.getShippingCharge()) - (productDto.getShippingCharge() * (productDto.getShippingDiscount()/100)));
-        product.setQuantityOrdered(productDto.getQuantityOrdered());
-        product.setProcessingTime(productDto.getProcessingTime());
-        product.setSaleStatus(false);
         product.setDateListed(new Date());
-        product.setTimeListed(new Date().getTime());
-        product.setReviews(productDto.getReviews());
-        product.setRatings(productDto.getRatings());
-        product.setCompanyName(productDto.getCompanyName());
-        product.setSupplierContact(productDto.getSupplierContact());
-        product.setCountry(productDto.getCountry());
 
         productReppo.save(product);
         ResponsePojo<Product> responsePojo = new ResponsePojo<>();
@@ -108,22 +92,7 @@ public class ProductService2 {
         product.setDescription(productDto.getDescription());
         product.setPrice(productDto.getPrice());
         product.setAvailableQuantity(productDto.getAvailableQuantity());
-        product.setTotalCost(productDto.getTotalCost());
-        product.setDiscount(productDto.getDiscount());
-        product.setActualAmount((productDto.getTotalCost()) - (productDto.getTotalCost() * (productDto.getDiscount()/100)));
-        product.setShippingCharge(productDto.getShippingCharge());
-        product.setShippingDiscount(productDto.getShippingDiscount());
-        product.setShippingCost((productDto.getShippingCharge()) - (productDto.getShippingCharge() * (productDto.getShippingDiscount()/100)));
-        product.setQuantityOrdered(productDto.getQuantityOrdered());
-        product.setProcessingTime(productDto.getProcessingTime());
-        product.setSaleStatus(false);
         product.setDateListed(new Date());
-        product.setTimeListed(new Date().getTime());
-        product.setReviews(productDto.getReviews());
-        product.setRatings(productDto.getRatings());
-        product.setCompanyName(productDto.getCompanyName());
-        product.setSupplierContact(productDto.getSupplierContact());
-        product.setCountry(productDto.getCountry());
 
         productReppo.save(product);
 
@@ -136,7 +105,7 @@ public class ProductService2 {
 
 
     //(3) Method to search for product with the following arguments
-    public ResponsePojo<Page<Product>> search(String productName, String companyName, Long productNumber, Pageable pageable){
+    public ResponsePojo<Page<Product>> search(String productName, Long productNumber, Pageable pageable){
 
         QProduct qProduct = QProduct.product;
         BooleanBuilder predicate = new BooleanBuilder();
@@ -144,10 +113,6 @@ public class ProductService2 {
         //if search was done by product name
         if(StringUtils.hasText(productName))
             predicate.and(qProduct.productName.likeIgnoreCase("%" + productName + "%"));
-
-        //if search was done by company name
-        if(StringUtils.hasText(companyName))
-            predicate.and(qProduct.companyName.likeIgnoreCase("%" + companyName + "%"));
 
         //if search was done by productNumber
         if(!ObjectUtils.isEmpty(productNumber))
@@ -170,28 +135,6 @@ public class ProductService2 {
     }
 
 
-    //(4) The methods stated here are to engage, input and increment certain features of the Product table
-    public ResponsePojo<Long> clientTransaction(Long Id, Long numberOrdered){
-
-        if(ObjectUtils.isEmpty(Id))
-            throw new ApiException("Id empty...insert Id");
-
-        Optional<Product> productOptional = productReppo.findById(Id);
-        productOptional.orElseThrow(()->new ApiException(String.format("Product with Id %s not found!", Id)));
-
-        Product product = productOptional.get();
-        product.setSaleStatus(true);
-        product.setDateSold(new Date());
-        product.setTransactionNumber(new Date().getTime());
-        product.setQuantityOrdered(product.getQuantityOrdered() + numberOrdered);
-
-        ResponsePojo<Long> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(product.getTotalCost());
-        responsePojo.setMessage("Transaction successful!");
-
-
-        return responsePojo;
-    }
 
     //(5) Method to Customize Product
     public ResponsePojo<Product> customizeProduct(Long Id){

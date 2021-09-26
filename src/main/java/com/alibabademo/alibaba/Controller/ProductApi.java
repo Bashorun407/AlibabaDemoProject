@@ -54,36 +54,12 @@ public class ProductApi {
         return productService.newArrivals();
     }
 
-    //(7) Method to get Ready-To-Ship Products
-    @GetMapping("/readyToShip")
-    public ResponsePojo<List<Product>> readyToShipProducts(){
-        return productService.readyToShipProducts();
-    }
-
-    //(8) Method to get Weekly Deals
-    //Adjustments may be needed here too
-    @GetMapping("/weeklyDeals")
-    public ResponsePojo<List<Product>> weeklyDeals(){
-        return productService.weeklyDeals();
-    }
-
     //(9) Method to get small Commodities products
     @GetMapping("/smallCommodities")
     public ResponsePojo<List<Product>> smallCommodities(){
         return productService.smallCommodities();
     }
 
-    //(10) Method to get Top Ranking Products
-    @GetMapping("/topRankingProducts")
-    public ResponsePojo<List<Product>> topRankingProducts(){
-        return productService.topRankingProducts();
-    }
-
-    //(11) Method to get top products by a company
-    @GetMapping("/topProductsByCompany/{companyName}")
-    public ResponsePojo<List<Product>> topProductsByCompany(@PathVariable  String companyName){
-        return productService.topProductsByCompany(companyName);
-    }
 
     //(12) Method to get products by category
     @GetMapping("/getConsumerElectronics/{searchItem}")
@@ -231,23 +207,6 @@ public class ProductApi {
         return productService.getProductDiscounts(searchItem);
     }
 
-    //(36) Method to get products by category
-    @GetMapping("/getShippingDiscounts/{searchItem}")
-    public ResponsePojo<List<Product>> getShippingDiscounts(@PathVariable String searchItem){
-        return productService.getShippingDiscounts(searchItem);
-    }
-
-    //(37) Method to get products by category
-    @GetMapping("/getTrendingProducts/{searchItem}")
-    public ResponsePojo<List<Product>> getTrendingProducts(@PathVariable String searchItem){
-        return productService.getTrendingProducts(searchItem);
-    }
-
-    //(38) Method to get products by category
-    @GetMapping("/getProductsAndShippingSavings/{searchItem}")
-    public ResponsePojo<List<Product>> getProductsAndShippingSavings(@PathVariable String searchItem){
-        return productService.getProductsAndShippingSavings(searchItem);
-    }
 
     //(39) Method to get products by category
     @GetMapping("/getToyAndHobbies/{searchItem}")
@@ -255,11 +214,6 @@ public class ProductApi {
         return productService.getToysAndHobbies(searchItem, type);
     }
 
-    //(40) Method to get products by category
-    @GetMapping("/getReadyToShip/{searchItem}")
-    public ResponsePojo<List<Product>> getReadyToShip(@PathVariable String searchItem){
-        return productService.getReadyToShip(searchItem);
-    }
 
     //(41) Method to get products by category
     @GetMapping("/getHygieneProducts/{searchItem}")

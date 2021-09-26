@@ -25,9 +25,6 @@ public class ProductReview {
     @Column(name = "Country")
     private String country;
 
-    @Column(name = "Number_Of_Reviews")
-    private Long numberOfReviews;
-
     @Column(name = "Five_Star_Rating")
     private Long fiveStarRating;
 
@@ -45,6 +42,9 @@ public class ProductReview {
 
     @Column(name = "Rating")
     private Long rating;
+
+    @Column(name = "Number_Of_Reviews")
+    private Long numberOfReviews;
 
     @Column(name = "Comment")
     private String comment;

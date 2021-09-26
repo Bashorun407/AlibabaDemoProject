@@ -28,40 +28,8 @@ public class ProductDto {
 
     private Long availableQuantity;
 
-    private Long totalCost;
-
     private Long discount;
 
-    private Long actualAmount;
-
-    private Long shippingCharge;
-
-    private Long shippingDiscount;
-
-    private Long shippingCost;
-
-    private Long quantityOrdered;
-
-    private String processingTime;
-
-    private Boolean saleStatus;
-
-    private Date dateSold;
-
-    private Long transactionNumber;
-
     private Date dateListed;
-
-    private Long timeListed;
-
-    private Long reviews;
-
-    private Long ratings;
-
-    private String companyName;
-
-    private Long supplierContact;
-
-    private String country;
 
 }

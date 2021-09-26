@@ -31,17 +31,11 @@ public class ProductApi2 {
     //(3) Method to search for product with the following arguments
     @GetMapping("/search")
     public ResponsePojo<Page<Product>> search(@RequestParam(name = "productName", required = false) String productName,
-                                              @RequestParam(name = "companyName", required = false) String companyName,
                                               @RequestParam(name = "productNumber", required = false) Long productNumber,
                                               Pageable pageable){
-        return productService2.search(productName, companyName, productNumber, pageable);
+        return productService2.search(productName, productNumber, pageable);
     }
 
-    //(4) The methods stated here are to engage, input and increment certain features of the Product table
-    @PutMapping("/clientTransaction/{Id}")
-    public ResponsePojo<Long> clientTransaction(@PathVariable Long Id, Long numberOrdered){
-        return  productService2.clientTransaction(Id, numberOrdered);
-    }
 
     //(5) Method to Customize Product
     @PutMapping("/customizeProduct/{Id}")
