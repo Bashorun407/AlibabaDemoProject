@@ -97,8 +97,8 @@ public class ProductReviewService {
 
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<ProductReview> jpaQuery = jpaQueryFactory.selectFrom(qProductReview)
-                .where(qProductReview.rating.between(80, 100))
-                .orderBy(qProductReview.numberOfReviews.desc());
+                .where(qProductReview.rating.gt(30))
+                .orderBy(qProductReview.country.desc());
 
         List<ProductReview> productList = jpaQuery.fetch();
 
@@ -119,7 +119,7 @@ public class ProductReviewService {
 
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<ProductReview> jpaQuery = jpaQueryFactory.selectFrom(qProductReview)
-                .where(predicate.and(qProductReview.numberOfReviews.gt(20)))
+                .where(predicate.and(qProductReview.numberOfReviews.gt(30)))
                 .orderBy(qProductReview.companyName.desc());
 
         List<ProductReview> productList = jpaQuery.fetch();
@@ -137,12 +137,12 @@ public class ProductReviewService {
         QProductReview qProductReview = QProductReview.productReview;
         BooleanBuilder predicate = new BooleanBuilder();
         if(StringUtils.hasText(searchItem))
-            predicate.and(qProductReview.fiveStarRating.between(7, 30));
+            predicate.and(qProductReview.fiveStarRating.between(20, 30));
 
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<ProductReview> jpaQuery = jpaQueryFactory.selectFrom(qProductReview)
-                .where(predicate.and(qProductReview.numberOfReviews.gt(20)))
-                .orderBy(qProductReview.numberOfReviews.desc());
+                .where(predicate.and(qProductReview.numberOfReviews.gt(15)))
+                .orderBy(qProductReview.companyName.desc());
 
         List<ProductReview> productList = jpaQuery.fetch();
 

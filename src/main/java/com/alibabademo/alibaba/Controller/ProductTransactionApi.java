@@ -49,12 +49,4 @@ public class ProductTransactionApi {
     }
 
 
-
-        //(40) Method to get products by category
-    @GetMapping("/getReadyToShip/{searchItem}")
-    public ResponsePojo<List<ProductTransaction>> getReadyToShip(@PathVariable String searchItem){
-        return productTransactionService.getReadyToShip(searchItem);
-    }
-
-
 }

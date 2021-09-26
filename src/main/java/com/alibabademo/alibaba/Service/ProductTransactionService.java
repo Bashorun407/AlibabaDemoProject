@@ -59,6 +59,11 @@ public class ProductTransactionService {
 
         productTran.setTotalCost((disCountPrice * numberOrdered) + shippingCost);
         productTran.setSaleStatus(true);
+
+        //If user paid for shipping
+        if(productTran.getShippingCost()!=0)
+            productTran.setShippingStatus(true);
+
         productTran.setDateSold(new Date());
         productTran.setTransactionNumber(new Date().getTime());
 
@@ -129,28 +134,6 @@ public class ProductTransactionService {
         ResponsePojo<List<ProductTransaction>> responsePojo = new ResponsePojo<>();
         responsePojo.setData(productList);
         responsePojo.setMessage("Small Commodities");
-
-        return responsePojo;
-    }
-
-
-    //(5) Method to get products by category
-    public ResponsePojo<List<ProductTransaction>> getReadyToShip(String searchItem){
-
-        QProductTransaction qProductTransaction = QProductTransaction.productTransaction;
-        BooleanBuilder predicate = new BooleanBuilder();
-        if(StringUtils.hasText(searchItem))
-            predicate.and(qProductTransaction.saleStatus.eq(true));
-
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        JPAQuery<ProductTransaction> jpaQuery = jpaQueryFactory.selectFrom(qProductTransaction)
-                .where(predicate.and(qProductTransaction.dateSold.gt(new Date())));//I need to use a Date function which I can use to select day intervals
-
-        List<ProductTransaction> productList = jpaQuery.fetch();
-
-        ResponsePojo<List<ProductTransaction>> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(productList);
-        responsePojo.setMessage("Ready To Ship Between 7 Days");
 
         return responsePojo;
     }
