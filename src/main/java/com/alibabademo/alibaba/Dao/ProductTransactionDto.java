@@ -13,7 +13,7 @@ public class ProductTransactionDto {
 
     private Long price;
 
-    private Date dateListed;
+    private Long productNumber;
 
     private Long quantityOrdered;
 

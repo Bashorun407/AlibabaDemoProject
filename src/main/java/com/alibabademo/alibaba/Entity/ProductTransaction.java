@@ -17,11 +17,11 @@ public class ProductTransaction {
     @Column(name = "Product_Name")
     private String productName;
 
+    @Column(name = "Product_Number")
+    private Long productNumber;
+
     @Column(name = "Price")
     private Long price;
-
-    @Column(name = "Date_Listed")
-    private Long dateListed;
 
     @Column(name = "Quantity_Ordered")
     private Long quantityOrdered;

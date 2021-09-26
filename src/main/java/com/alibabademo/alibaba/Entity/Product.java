@@ -47,4 +47,7 @@ public class Product {
 
     @Column(name = "Date_Listed")
     private Date dateListed;
+
+    @Column(name = "Company_Name")
+    private String companyName;
     }

@@ -32,4 +32,5 @@ public class ProductDto {
 
     private Date dateListed;
 
+    private String companyName;
 }

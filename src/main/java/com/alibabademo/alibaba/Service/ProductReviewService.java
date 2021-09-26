@@ -3,6 +3,7 @@ package com.alibabademo.alibaba.Service;
 import com.alibabademo.alibaba.Dao.ProductReviewDto;
 import com.alibabademo.alibaba.Entity.*;
 import com.alibabademo.alibaba.Exception.ApiException;
+import com.alibabademo.alibaba.Repository.ProductReppo;
 import com.alibabademo.alibaba.Repository.ProductReviewReppo;
 import com.alibabademo.alibaba.RestResponse.ResponsePojo;
 import com.querydsl.core.BooleanBuilder;
@@ -21,7 +22,11 @@ import java.util.Optional;
 public class ProductReviewService {
 
     @Autowired
+    private ProductReppo productReppo;
+
+    @Autowired
     private ProductReviewReppo productReviewReppo;
+
 
     @Autowired
     private EntityManager entityManager;
@@ -35,21 +40,26 @@ public class ProductReviewService {
             throw new ApiException("Id is needed for Rating");
 
         //Introducing ProductReppo to verify information entered
-        Optional<ProductReview> productReviewOptional1 = productReviewReppo.findById(productReviewDto.getId());
-        productReviewOptional1.orElseThrow(()->new ApiException(String.format("Product with this Id %s, not found!", productReviewDto.getId())));
+        Optional<Product> productOptional1 = productReppo.findById(productReviewDto.getId());
+        productOptional1.orElseThrow(()->new ApiException(String.format("Product with this Id %s, not found!", productReviewDto.getProductNumber())));
 
-        Optional<ProductReview> productReviewOptional2 = productReviewReppo.findByProductNumber(productReviewDto.getProductNumber());
-        productReviewOptional2.orElseThrow(()->new ApiException(String.format("Product with this Number %s not found!!", productReviewDto.getId())));
+        Optional<Product> productOptional2 = productReppo.findByProductNumber(productReviewDto.getProductNumber());
+        productOptional2.orElseThrow(()->new ApiException(String.format("Product with this Number %s not found!!", productReviewDto.getId())));
 
         //To verify that the Id and Product Number entered are for the same product
-        ProductReview productRev1 = productReviewOptional1.get();
-        ProductReview productRev2 = productReviewOptional2.get();
+        Product productRev1 = productOptional1.get();
+        Product productRev2 = productOptional2.get();
 
         if(productRev1 != productRev2)
             throw new ApiException("The Id Entered and Product-Number entered are for different products...Try again");
 
         //The following retrieves the data needed from the database
         ProductReview productRev = new ProductReview();
+        productRev.setId(productReviewDto.getId());
+        productRev.setProductName(productReviewDto.getProductName());
+        productRev.setProductNumber(productReviewDto.getProductNumber());
+        productRev.setCompanyName(productReviewDto.getCompanyName());
+        productRev.setComment(productReviewDto.getComment());
 
         //Conditional flows to check and update rating
         if(rating == 5) {

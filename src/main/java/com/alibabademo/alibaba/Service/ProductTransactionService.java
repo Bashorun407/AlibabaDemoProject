@@ -27,37 +27,47 @@ public class ProductTransactionService {
     @Autowired
     private ProductReppo productReppo;
 
+    @Autowired
     private EntityManager entityManager;
 
     //(1) The methods stated here are to engage, input and increment certain features of the Product table
-    public ResponsePojo<ProductTransaction> clientTransaction(Long Id, Long numberOrdered, Long discount, Long shippingCost,
-                                                String companyName,
-                                                Long supplierContact,
-                                                String country){
+    public ResponsePojo<ProductTransaction> clientTransaction(ProductTransaction productTransaction, Boolean buyStatus){
 
-        if(ObjectUtils.isEmpty(Id))
+        if(ObjectUtils.isEmpty(productTransaction.getId()))
             throw new ApiException("Id empty...insert Id");
-        Optional<Product> productOptional = productReppo.findById(Id);
-        productOptional.orElseThrow(()->new ApiException(String.format("Product with Id %s not found!", Id)));
+        Optional<Product> productOptional1 = productReppo.findById(productTransaction.getId());
+        productOptional1.orElseThrow(()->new ApiException(String.format("Product with Id %s not found!", productTransaction.getId())));
+
+        Optional<Product> productOptional2 = productReppo.findByProductNumber(productTransaction.getProductNumber());
+        productOptional2.orElseThrow(()-> new ApiException(String.format("Product with this Product-Number: %s not found!!", productTransaction.getProductNumber())));
+
+        Product prod1 = productOptional1.get();
+        Product prod2 = productOptional2.get();
+
+        if(prod1!= prod2)
+            throw new ApiException("The Id and Product Number Entered are for different products...try again!");
+
+       if(buyStatus == false)
+           throw new ApiException("This transaction is cancelled!!");
 
         ProductTransaction productTran = new ProductTransaction();
-        productTran.setQuantityOrdered(numberOrdered);
-        productTran.setId(productOptional.get().getId());
-        productTran.setProductName(productOptional.get().getProductName());
-        productTran.setPrice(productOptional.get().getPrice());
-        productTran.setQuantityOrdered(numberOrdered);
-        productTran.setDiscount(discount);
-        productTran.setShippingCost(shippingCost);
-        productTran.setCompanyName(companyName);
-        productTran.setSupplierContact(supplierContact);
-        productTran.setCountry(country);
+
+        productTran.setId(productTransaction.getId());
+        productTran.setProductName(productOptional1.get().getProductName());
+        productTran.setPrice(productOptional1.get().getPrice());
+        productTran.setQuantityOrdered(productTransaction.getQuantityOrdered());
+        productTran.setDiscount(productOptional1.get().getDiscount());
+        productTran.setShippingCost(productTransaction.getShippingCost());
+        productTran.setCompanyName(productTransaction.getCompanyName());
+        productTran.setSupplierContact(productTransaction.getSupplierContact());
+        productTran.setCountry(productTransaction.getCountry());
 
         //Calculation to get total cost
-        Long price = productOptional.get().getPrice();
-        Long disCountPrice = price - (discount * price/100);
+        Long price = productOptional1.get().getPrice();
+        Long disCountPrice = price - ((productOptional1.get().getDiscount()) * price/100);
 
 
-        productTran.setTotalCost((disCountPrice * numberOrdered) + shippingCost);
+        productTran.setTotalCost((disCountPrice * productTransaction.getQuantityOrdered()) + productTran.getShippingCost());
         productTran.setSaleStatus(true);
 
         //If user paid for shipping
@@ -66,6 +76,7 @@ public class ProductTransactionService {
 
         productTran.setDateSold(new Date());
         productTran.setTransactionNumber(new Date().getTime());
+        productTran.setProcessingTime(productTransaction.getProcessingTime());
 
 
         productTransactionReppo.save(productTran);

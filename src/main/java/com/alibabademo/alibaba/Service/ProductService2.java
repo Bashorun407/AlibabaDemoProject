@@ -50,6 +50,7 @@ public class ProductService2 {
         product.setPrice(productDto.getPrice());
         product.setAvailableQuantity(productDto.getAvailableQuantity());
         product.setDateListed(new Date());
+        product.setCompanyName(productDto.getCompanyName());
 
         productReppo.save(product);
         ResponsePojo<Product> responsePojo = new ResponsePojo<>();
