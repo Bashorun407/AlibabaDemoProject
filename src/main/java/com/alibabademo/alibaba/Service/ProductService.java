@@ -16,6 +16,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -464,17 +465,18 @@ public class ProductService {
     }
 
     //(21) Method to get products by category
-    public ResponsePojo<List<Product>> getHomeAppliances(String homeAppliances){
+
+    public ResponsePojo<List<Product>> getHomeAppliances(String searchItem, String type){
 
         QProduct qProduct = QProduct.product;
         BooleanBuilder predicate = new BooleanBuilder();
-        if(StringUtils.hasText(homeAppliances))
-            predicate.and(qProduct.category.likeIgnoreCase("%" + homeAppliances + "%"));
+        if(StringUtils.hasText(searchItem))
+            predicate.and(qProduct.category.likeIgnoreCase("%" + searchItem + "%"));
 
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(predicate)
-                .orderBy(qProduct.availableQuantity.desc());
+                .where(predicate.and(qProduct.productType.likeIgnoreCase(type)))
+                .orderBy(qProduct.Id.desc());
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -574,26 +576,6 @@ public class ProductService {
     }
 
     //(26) Method to get products by category
-    public ResponsePojo<List<Product>> getHomeAppliances(String searchItem, String type){
-
-        QProduct qProduct = QProduct.product;
-        BooleanBuilder predicate = new BooleanBuilder();
-        if(StringUtils.hasText(searchItem))
-            predicate.and(qProduct.category.likeIgnoreCase("%" + searchItem + "%"));
-
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(predicate.and(qProduct.productType.likeIgnoreCase(type)))
-                .orderBy(qProduct.Id.desc());
-
-        List<Product> productList = jpaQuery.fetch();
-
-        ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(productList);
-        responsePojo.setMessage("Home Appliances");
-
-        return responsePojo;
-    }
 
     //(27) Method to get products by category
     public ResponsePojo<List<Product>> getPackagingAndPrinting(String searchItem, String type){
@@ -825,7 +807,7 @@ public class ProductService {
 
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(qProduct.dateListed.after(qProduct.dateListed));//this is not exactly how  I want this represented!!
+                .where(qProduct.dateListed.lt(new Date())); //this is not exactly how  I want this represented!!
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -845,7 +827,7 @@ public class ProductService {
 
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(qProduct.price.min().between(100, 200).and(qProduct.availableQuantity.between(10, 50)));//this is not exactly how  I want this represented!!
+                .where(qProduct.price.between(100, 1000).or(qProduct.availableQuantity.between(10,500)));//this is not exactly how  I want this represented!!
 
         List<Product> productList = jpaQuery.fetch();
 
@@ -858,16 +840,14 @@ public class ProductService {
     }
 
     //(5) Method to get products by category
-    public ResponsePojo<List<Product>> getProductDiscounts(String searchItem){
+    public ResponsePojo<List<Product>> getProductDiscounts(){
 
         QProduct qProduct = QProduct.product;
-        BooleanBuilder predicate = new BooleanBuilder();
-        if(StringUtils.hasText(searchItem))
-            predicate.and(qProduct.discount.between(1, 15));
+        //BooleanBuilder predicate = new BooleanBuilder();
 
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)
-                .where(predicate)
+                .where(qProduct.discount.between(5, 9))
                 .orderBy(qProduct.discount.desc());
 
         List<Product> productList = jpaQuery.fetch();

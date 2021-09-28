@@ -11,10 +11,6 @@ public class ProductReviewDto {
 
     private Long productNumber;
 
-    private String companyName;
-
-    private String country;
-
     private Long numberOfReviews;
 
     private Long fiveStarRating;

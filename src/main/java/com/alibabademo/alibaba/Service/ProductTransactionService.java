@@ -1,5 +1,6 @@
 package com.alibabademo.alibaba.Service;
 
+import com.alibabademo.alibaba.Dao.ProductTransactionDto;
 import com.alibabademo.alibaba.Entity.Product;
 import com.alibabademo.alibaba.Entity.ProductTransaction;
 import com.alibabademo.alibaba.Entity.QProductTransaction;
@@ -11,6 +12,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -19,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class ProductTransactionService {
 
     @Autowired
@@ -31,43 +34,38 @@ public class ProductTransactionService {
     private EntityManager entityManager;
 
     //(1) The methods stated here are to engage, input and increment certain features of the Product table
-    public ResponsePojo<ProductTransaction> clientTransaction(ProductTransaction productTransaction, Boolean buyStatus){
+    public ResponsePojo<ProductTransaction> clientTransaction(Long Id, ProductTransactionDto productTranDto){
 
-        if(ObjectUtils.isEmpty(productTransaction.getId()))
+        if(ObjectUtils.isEmpty(Id))
             throw new ApiException("Id empty...insert Id");
-        Optional<Product> productOptional1 = productReppo.findById(productTransaction.getId());
-        productOptional1.orElseThrow(()->new ApiException(String.format("Product with Id %s not found!", productTransaction.getId())));
+        Optional<Product> productOptional1 = productReppo.findById(Id);
+        productOptional1.orElseThrow(()->new ApiException(String.format("Product with Id %s not found!", Id)));
 
-        Optional<Product> productOptional2 = productReppo.findByProductNumber(productTransaction.getProductNumber());
-        productOptional2.orElseThrow(()-> new ApiException(String.format("Product with this Product-Number: %s not found!!", productTransaction.getProductNumber())));
-
-        Product prod1 = productOptional1.get();
-        Product prod2 = productOptional2.get();
-
-        if(prod1!= prod2)
-            throw new ApiException("The Id and Product Number Entered are for different products...try again!");
-
-       if(buyStatus == false)
-           throw new ApiException("This transaction is cancelled!!");
 
         ProductTransaction productTran = new ProductTransaction();
 
-        productTran.setId(productTransaction.getId());
+        productTran.setId(productOptional1.get().getId());
         productTran.setProductName(productOptional1.get().getProductName());
+        productTran.setProductNumber(productOptional1.get().getProductNumber());
         productTran.setPrice(productOptional1.get().getPrice());
-        productTran.setQuantityOrdered(productTransaction.getQuantityOrdered());
+        productTran.setQuantityOrdered(productTranDto.getQuantityOrdered());
         productTran.setDiscount(productOptional1.get().getDiscount());
-        productTran.setShippingCost(productTransaction.getShippingCost());
-        productTran.setCompanyName(productTransaction.getCompanyName());
-        productTran.setSupplierContact(productTransaction.getSupplierContact());
-        productTran.setCountry(productTransaction.getCountry());
+        productTran.setShippingCost(productTranDto.getShippingCost());
+        productTran.setCompanyName(productTranDto.getCompanyName());
+        productTran.setSupplierContact(productTranDto.getSupplierContact());
+        productTran.setCountry(productTranDto.getCountry());
+
+        Long amountPaid = productTranDto.getPrice();
+        Long costPrice = productTran.getPrice();
+
+        if( amountPaid<costPrice)
+            throw new ApiException("This transaction is cancelled!!");
 
         //Calculation to get total cost
-        Long price = productOptional1.get().getPrice();
-        Long disCountPrice = price - ((productOptional1.get().getDiscount()) * price/100);
+        Long disCountPrice = costPrice - ((productOptional1.get().getDiscount()) * costPrice/100);
 
 
-        productTran.setTotalCost((disCountPrice * productTransaction.getQuantityOrdered()) + productTran.getShippingCost());
+        productTran.setTotalCost((disCountPrice * productTranDto.getQuantityOrdered()) + productTran.getShippingCost());
         productTran.setSaleStatus(true);
 
         //If user paid for shipping
@@ -76,7 +74,7 @@ public class ProductTransactionService {
 
         productTran.setDateSold(new Date());
         productTran.setTransactionNumber(new Date().getTime());
-        productTran.setProcessingTime(productTransaction.getProcessingTime());
+        productTran.setProcessingTime(productTranDto.getProcessingTime());
 
 
         productTransactionReppo.save(productTran);
@@ -131,7 +129,7 @@ public class ProductTransactionService {
     }
 
     //(4) Method to get small Commodities products
-    public ResponsePojo<List<ProductTransaction>> smallCommodities(){
+    public ResponsePojo<List<ProductTransaction>> lowPriceCommodities(){
         QProductTransaction qProductTransaction = QProductTransaction.productTransaction;
         //BooleanBuilder predicate = new BooleanBuilder();
 

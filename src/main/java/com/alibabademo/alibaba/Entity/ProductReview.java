@@ -10,7 +10,6 @@ public class ProductReview {
 
     @Id
     @Column(name = "ID")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long Id;
 
     @Column(name = "Product_Name")
@@ -18,12 +17,6 @@ public class ProductReview {
 
     @Column(name = "Product_Number")
     private Long productNumber;
-
-    @Column(name = "Company_Name")
-    private String companyName;
-
-    @Column(name = "Country")
-    private String country;
 
     @Column(name = "Five_Star_Rating")
     private Long fiveStarRating;

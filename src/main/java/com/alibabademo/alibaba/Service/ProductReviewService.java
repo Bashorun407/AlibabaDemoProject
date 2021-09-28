@@ -32,70 +32,94 @@ public class ProductReviewService {
     private EntityManager entityManager;
 
 
-    //(1) Method 1 for Creating a ProductReview
-    public ResponsePojo<ProductReview> updateRatingsAndReviews(ProductReviewDto productReviewDto, Long rating){
+    //Method to create review
+    public ResponsePojo<ProductReview> createReview(Long Id, ProductReviewDto productRevDto){
 
         //To verify that 'empty' or 'null' values are not entered into the database
-        if(ObjectUtils.isEmpty(productReviewDto.getId()))
-            throw new ApiException("Id is needed for Rating");
+        if(ObjectUtils.isEmpty(Id))
+            throw new ApiException("Id is needed to rate this product!!");
 
         //Introducing ProductReppo to verify information entered
-        Optional<Product> productOptional1 = productReppo.findById(productReviewDto.getId());
-        productOptional1.orElseThrow(()->new ApiException(String.format("Product with this Id %s, not found!", productReviewDto.getProductNumber())));
+        Optional<Product> productOptional1 = productReppo.findById(Id);
+        productOptional1.orElseThrow(()->new ApiException(String.format("Product with this Id %s, not found!", Id)));
 
-        Optional<Product> productOptional2 = productReppo.findByProductNumber(productReviewDto.getProductNumber());
-        productOptional2.orElseThrow(()->new ApiException(String.format("Product with this Number %s not found!!", productReviewDto.getId())));
-
-        //To verify that the Id and Product Number entered are for the same product
-        Product productRev1 = productOptional1.get();
-        Product productRev2 = productOptional2.get();
-
-        if(productRev1 != productRev2)
-            throw new ApiException("The Id Entered and Product-Number entered are for different products...Try again");
-
-        //The following retrieves the data needed from the database
         ProductReview productRev = new ProductReview();
-        productRev.setId(productReviewDto.getId());
-        productRev.setProductName(productReviewDto.getProductName());
-        productRev.setProductNumber(productReviewDto.getProductNumber());
-        productRev.setCompanyName(productReviewDto.getCompanyName());
-        productRev.setComment(productReviewDto.getComment());
+        //The following information were collected from the Product Database
+        productRev.setId(productOptional1.get().getId());
+        productRev.setProductName(productOptional1.get().getProductName());
+        productRev.setProductNumber(productOptional1.get().getProductNumber());
 
-        //Conditional flows to check and update rating
-        if(rating == 5) {
-            productRev.setFiveStarRating(productReviewDto.getFiveStarRating() + 1);
-        }
+        //The following data are collected from the productRevDto object to initialize the variables with zero value instead of 'null'
+        productRev.setFiveStarRating(productRevDto.getFiveStarRating());
+        productRev.setFourStarRating(productRevDto.getFourStarRating());
+        productRev.setThreeStarRating(productRevDto.getThreeStarRating());
+        productRev.setTwoStarRating(productRevDto.getTwoStarRating());
+        productRev.setOneStarRating(productRevDto.getOneStarRating());
+        productRev.setRating(productRevDto.getRating());
+        productRev.setNumberOfReviews(productRevDto.getNumberOfReviews());
 
-        if(rating == 4) {
-            productRev.setFourStarRating(productReviewDto.getFourStarRating() + 1);
-        }
 
-        if(rating == 3) {
-            productRev.setThreeStarRating(productReviewDto.getThreeStarRating() + 1);
-        }
-
-        if(rating == 2) {
-            productRev.setThreeStarRating(productReviewDto.getTwoStarRating() + 1);
-        }
-
-        if(rating == 1) {
-            productRev.setOneStarRating(productReviewDto.getOneStarRating() + 1);
-        }
-
-        productReviewReppo.save(productRev);
-
-        Long ratingTotal = (productRev.getFiveStarRating() + (productRev.getFourStarRating() * 80/100)
-                + (productRev.getThreeStarRating() * 60/100) + (productRev.getTwoStarRating() * 40/100)
-                + (productRev.getOneStarRating() * 20/100))/5;
-
-        //Getting Rating and Review Entity for ProductReview Entity
-        productRev.setRating(ratingTotal);
-        productRev.setNumberOfReviews(productRev.getNumberOfReviews() + 1);
         productReviewReppo.save(productRev);
 
         ResponsePojo<ProductReview> responsePojo = new ResponsePojo<>();
         responsePojo.setData(productRev);
-        responsePojo.setMessage(String.format("Review for Product with Id %s, done!", productReviewDto.getId() ));
+        responsePojo.setMessage("Review variables initiated!");
+
+        return responsePojo;
+    }
+
+    //(1) Method 1 for Creating a ProductReview
+    public ResponsePojo<ProductReview> updateRatings(Long Id, Long rating, ProductReviewDto productRevDto){
+
+        //To verify that 'empty' or 'null' values are not entered into the database
+        if(ObjectUtils.isEmpty(Id))
+            throw new ApiException("Id is needed to rate this product!!");
+
+        if(!(rating>=1 && rating<=5))
+            throw new ApiException("rating must be from 1 to 5!!");
+
+        //Introducing ProductReppo to verify information entered
+        Optional<ProductReview> productReviewOptional1 = productReviewReppo.findById(Id);
+        productReviewOptional1.orElseThrow(()->new ApiException(String.format("Product with this Id %s, not found!", Id)));
+
+        //The following retrieves the data needed from the Product database
+        ProductReview productRev = productReviewOptional1.get();
+
+                //Conditional flows to check and update rating
+        if(rating == 5) {
+            productRev.setFiveStarRating(productRev.getFiveStarRating() + 1);
+        }
+
+        if(rating == 4) {
+            productRev.setFourStarRating(productRev.getFourStarRating() + 1);
+        }
+
+        if(rating == 3) {
+            productRev.setThreeStarRating(productRev.getThreeStarRating() + 1);
+        }
+
+        if(rating == 2) {
+            productRev.setTwoStarRating(productRev.getTwoStarRating() + 1);
+        }
+
+        if(rating == 1) {
+            productRev.setOneStarRating(productRev.getOneStarRating() + 1);
+        }
+
+        Long one = (productRev.getOneStarRating() * 20/100);
+        Long two = (productRev.getTwoStarRating() * 40/100);
+        Long three = (productRev.getThreeStarRating() * 60/100);
+        Long four = (productRev.getFourStarRating() * 80/100);
+        Long five = productRev.getFiveStarRating();
+
+        //Getting Rating value for ProductReview
+        Long ratingTotal = one + two + three + four + five;
+        productRev.setRating(ratingTotal);
+
+        productReviewReppo.save(productRev);
+        ResponsePojo<ProductReview> responsePojo = new ResponsePojo<>();
+        responsePojo.setData(productRev);
+        responsePojo.setMessage(String.format("Review for Product with Id %s, done!", productRevDto.getId()));
 
         return responsePojo;
     }
@@ -108,7 +132,7 @@ public class ProductReviewService {
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<ProductReview> jpaQuery = jpaQueryFactory.selectFrom(qProductReview)
                 .where(qProductReview.rating.gt(30))
-                .orderBy(qProductReview.country.desc());
+                .orderBy(qProductReview.Id.desc());
 
         List<ProductReview> productList = jpaQuery.fetch();
 
@@ -119,46 +143,72 @@ public class ProductReviewService {
         return responsePojo;
     }
 
-    //(3) Method to get top products by a company
-    public ResponsePojo<List<ProductReview>> topProductsByCompany(String companyName){
-        QProductReview qProductReview = QProductReview.productReview;
-        BooleanBuilder predicate = new BooleanBuilder();
-
-        if(StringUtils.hasText(companyName))
-            predicate.and(qProductReview.companyName.likeIgnoreCase("%" + companyName + "%"));
-
-        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        JPAQuery<ProductReview> jpaQuery = jpaQueryFactory.selectFrom(qProductReview)
-                .where(predicate.and(qProductReview.numberOfReviews.gt(30)))
-                .orderBy(qProductReview.companyName.desc());
-
-        List<ProductReview> productList = jpaQuery.fetch();
-
-        ResponsePojo<List<ProductReview>> responsePojo = new ResponsePojo<>();
-        responsePojo.setData(productList);
-        responsePojo.setMessage("Top Products by Company");
-
-        return responsePojo;
-    }
+//    //(3) Method to get top products by a company
+//    public ResponsePojo<List<ProductReview>> topProductsByCompany(String companyName){
+//        QProductReview qProductReview = QProductReview.productReview;
+//        BooleanBuilder predicate = new BooleanBuilder();
+//
+//        if(StringUtils.hasText(companyName))
+//            predicate.and(qProductReview.companyName.likeIgnoreCase("%" + companyName + "%"));
+//
+//        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
+//        JPAQuery<ProductReview> jpaQuery = jpaQueryFactory.selectFrom(qProductReview)
+//                .where(predicate.and(qProductReview.numberOfReviews.gt(30)))
+//                .orderBy(qProductReview.Id.desc());
+//
+//        List<ProductReview> productList = jpaQuery.fetch();
+//
+//        ResponsePojo<List<ProductReview>> responsePojo = new ResponsePojo<>();
+//        responsePojo.setData(productList);
+//        responsePojo.setMessage("Top Products by Company");
+//
+//        return responsePojo;
+//    }
 
     //(4) Method to get products by category
-    public ResponsePojo<List<ProductReview>> getTrendingProducts(String searchItem){
+    public ResponsePojo<List<ProductReview>> getTrendingProducts(){
 
         QProductReview qProductReview = QProductReview.productReview;
         BooleanBuilder predicate = new BooleanBuilder();
-        if(StringUtils.hasText(searchItem))
+
             predicate.and(qProductReview.fiveStarRating.between(20, 30));
 
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<ProductReview> jpaQuery = jpaQueryFactory.selectFrom(qProductReview)
-                .where(predicate.and(qProductReview.numberOfReviews.gt(15)))
-                .orderBy(qProductReview.companyName.desc());
+                .where(predicate.and(qProductReview.fiveStarRating.gt(15)))
+                .orderBy(qProductReview.Id.desc());
 
         List<ProductReview> productList = jpaQuery.fetch();
 
         ResponsePojo<List<ProductReview>> responsePojo = new ResponsePojo<>();
         responsePojo.setData(productList);
         responsePojo.setMessage("Trending Products");
+
+        return responsePojo;
+    }
+
+    //(5) Method to get user's comment
+    public ResponsePojo<ProductReview> getUsersComment(Long Id, ProductReviewDto productReviewDto ){
+
+        if(ObjectUtils.isEmpty(Id))
+            throw new ApiException("Id is needed for review");
+
+        Optional<ProductReview> productReviewOptional = productReviewReppo.findById(Id);
+        productReviewOptional.orElseThrow(()->new ApiException(String.format("Product with this Id %s does not exist", Id)));
+
+        ProductReview productRev = productReviewOptional.get();
+
+        //Adding new comments to old comments
+        productRev.setComment(  "(" + productReviewDto.getComment() +  ")" + " ("+ productRev.getComment() +") " );
+
+        //increasing the number of reviews by 1 whenever a user makes a comment on a product
+        productRev.setNumberOfReviews(productRev.getNumberOfReviews() + 1);
+
+        productReviewReppo.save(productRev);
+
+        ResponsePojo<ProductReview> responsePojo = new ResponsePojo<>();
+        responsePojo.setMessage("Thanks for your feedback!");
+        responsePojo.setData(productRev);
 
         return responsePojo;
     }

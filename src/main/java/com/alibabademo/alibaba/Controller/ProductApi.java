@@ -148,10 +148,6 @@ public class ProductApi {
     }
 
     //(26) Method to get products by category
-    @GetMapping("/getHomeAppliances/{homeAppliances}")
-    public ResponsePojo<List<Product>> getHomeAppliances(@PathVariable String homeAppliances){
-        return productService.getHomeAppliances(homeAppliances);
-    }
 
     //(27) Method to get products by category
     @GetMapping("/getLightning/{searchWord}")
@@ -202,9 +198,9 @@ public class ProductApi {
     }
 
     //(35) Method to get products by category
-    @GetMapping("/getProductDiscounts/{searchItem}")
-    public ResponsePojo<List<Product>> getProductDiscounts(@PathVariable String searchItem){
-        return productService.getProductDiscounts(searchItem);
+    @GetMapping("/getProductDiscounts")
+    public ResponsePojo<List<Product>> getProductDiscounts(){
+        return productService.getProductDiscounts();
     }
 
 

@@ -36,10 +36,11 @@ public class ProductService2 {
         if(!StringUtils.hasText(productDto.getProductName()))
             throw new ApiException("Product name is required to create product!!");
 
-        Optional<Product>  productOptional = productReppo.findById(productDto.getId());
-        productOptional.orElseThrow(()->new ApiException(String.format("The product with this id: %s exists!!", productDto.getId())));
+//        Optional<Product>  productOptional = productReppo.findById(productDto.getId());
+//        productOptional.orElseThrow(()->new ApiException(String.format("The product with this id: %s exists!!", productDto.getId())));
 
         Product product = new Product();
+
         product.setProductName(productDto.getProductName());
         product.setProductNumber(new Date().getTime());
         product.setCategory(productDto.getCategory());
@@ -49,6 +50,7 @@ public class ProductService2 {
         product.setDescription(productDto.getDescription());
         product.setPrice(productDto.getPrice());
         product.setAvailableQuantity(productDto.getAvailableQuantity());
+        product.setDiscount(productDto.getDiscount());
         product.setDateListed(new Date());
         product.setCompanyName(productDto.getCompanyName());
 
@@ -117,7 +119,7 @@ public class ProductService2 {
 
         //if search was done by productNumber
         if(!ObjectUtils.isEmpty(productNumber))
-            predicate.and(qProduct.productName.eq(productName));
+            predicate.and(qProduct.productNumber.eq(productNumber));
 
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<Product> jpaQuery = jpaQueryFactory.selectFrom(qProduct)

@@ -11,7 +11,7 @@ import java.util.Date;
 public class Product {
 
     @Id
-    @Column(name = "ID")
+    @Column(name = "ID", unique = true)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long Id;
 
@@ -50,4 +50,5 @@ public class Product {
 
     @Column(name = "Company_Name")
     private String companyName;
+
     }

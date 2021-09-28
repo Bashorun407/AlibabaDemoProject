@@ -11,7 +11,6 @@ public class ProductTransaction {
 
     @Id
     @Column(name = "Id")
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long Id;
 
     @Column(name = "Product_Name")
