@@ -576,8 +576,6 @@ public class ProductService {
     }
 
     //(26) Method to get products by category
-
-    //(27) Method to get products by category
     public ResponsePojo<List<Product>> getPackagingAndPrinting(String searchItem, String type){
 
         QProduct qProduct = QProduct.product;
@@ -599,7 +597,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(28) Method to get products by category
+    //(27) Method to get products by category
     public ResponsePojo<List<Product>> getOfficeAndSchoolSupplies(String searchItem, String type){
 
         QProduct qProduct = QProduct.product;
@@ -621,7 +619,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(29) Method to get products by category
+    //(28) Method to get products by category
     public ResponsePojo<List<Product>> getElectricalEquipments(String searchItem, String type){
 
         QProduct qProduct = QProduct.product;
@@ -644,7 +642,7 @@ public class ProductService {
     }
 
 
-    //(30) Method to get products by category
+    //(29) Method to get products by category
     public ResponsePojo<List<Product>> getHygieneProducts(String searchItem){
 
         QProduct qProduct = QProduct.product;
@@ -666,7 +664,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(31) Method to get products by category
+    //(30) Method to get products by category
     public ResponsePojo<List<Product>> getFragranceDeodorant(String searchItem){
 
         QProduct qProduct = QProduct.product;
@@ -689,7 +687,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(32) Method to get products by category
+    //(31) Method to get products by category
     public ResponsePojo<List<Product>> getPersonalHygieneProducts(String searchWord){
 
         QProduct qProduct = QProduct.product;
@@ -711,7 +709,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(33) Method to get products by category
+    //(32) Method to get products by category
     public ResponsePojo<List<Product>> getBathroomProducts(String searchWord){
 
         QProduct qProduct = QProduct.product;
@@ -799,7 +797,7 @@ public class ProductService {
         return responsePojo;
     }
 
-    //(6) Method to get New Arrivals
+    //(37) Method to get New Arrivals
     //***This API is not fully developed with its required features***
     public ResponsePojo<List<Product>> newArrivals(){
         QProduct qProduct = QProduct.product;
@@ -819,7 +817,7 @@ public class ProductService {
 
     }
 
-    //(9) Method to get small Commodities products
+    //(38) Method to get small Commodities products
     public ResponsePojo<List<Product>> smallCommodities(){
 
         QProduct qProduct = QProduct.product;
@@ -839,7 +837,7 @@ public class ProductService {
 
     }
 
-    //(5) Method to get products by category
+    //(39) Method to get products by category
     public ResponsePojo<List<Product>> getProductDiscounts(){
 
         QProduct qProduct = QProduct.product;

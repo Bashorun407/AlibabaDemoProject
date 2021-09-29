@@ -23,9 +23,9 @@ public class ProductApi2 {
     }
 
     //(2) Update product
-    @PutMapping("/updateProduct")
-    public ResponsePojo<Product> productUpdate(@RequestBody ProductDto productDto){
-        return productService2.productUpdate(productDto);
+    @PutMapping("/updateProduct/{Id}")
+    public ResponsePojo<Product> productUpdate(@PathVariable Long Id, @RequestBody ProductDto productDto){
+        return productService2.productUpdate(Id, productDto);
     }
 
     //(3) Method to search for product with the following arguments
@@ -37,13 +37,13 @@ public class ProductApi2 {
     }
 
 
-    //(5) Method to Customize Product
+    //(4) Method to Customize Product
     @PutMapping("/customizeProduct/{Id}")
     public ResponsePojo<Product> customizeProduct(@PathVariable Long Id){
         return productService2.customizeProduct(Id);
     }
 
-    //(6) Method to remove product
+    //(5) Method to remove product
     @DeleteMapping("/deleteProduct/{Id}")
     public void removeProduct(@PathVariable Long Id){
          productService2.removeProduct(Id);

@@ -37,6 +37,4 @@ public class ProductTransactionDto {
 
     private String country;
 
-
-
 }

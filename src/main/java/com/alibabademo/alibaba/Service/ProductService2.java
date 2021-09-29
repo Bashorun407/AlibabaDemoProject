@@ -63,16 +63,16 @@ public class ProductService2 {
     }
 
     //(2) Update product
-    public ResponsePojo<Product> productUpdate(ProductDto productDto){
+    public ResponsePojo<Product> productUpdate(Long Id, ProductDto productDto){
 
-        if(ObjectUtils.isEmpty(productDto.getId()))
+        if(ObjectUtils.isEmpty(Id))
             throw new ApiException("Product Id is empty!! Enter Id");
 
         if(ObjectUtils.isEmpty(productDto.getProductNumber()))
             throw new ApiException("Product number is required for update!!");
 
-        Optional<Product> productOptional1 = productReppo.findById(productDto.getId());
-        productOptional1.orElseThrow(()-> new ApiException(String.format("Product with this Id %s not found!!", productDto.getId())));
+        Optional<Product> productOptional1 = productReppo.findById(Id);
+        productOptional1.orElseThrow(()-> new ApiException(String.format("Product with this Id %s not found!!", Id)));
 
         Optional<Product> productOptional2 = productReppo.findByProductNumber(productDto.getProductNumber());
         productOptional2.orElseThrow(()-> new ApiException(String.format("Product with this product-number %s not found!!",
@@ -86,7 +86,7 @@ public class ProductService2 {
             throw new ApiException("The product Id and product number entered are for different products!!");
 
         //Now the update begins
-        Product product = new Product();
+        Product product = productOptional1.get();
         product.setProductName(productDto.getProductName());
         product.setCategory(productDto.getCategory());
         product.setProductType(productDto.getProductType());
@@ -139,7 +139,7 @@ public class ProductService2 {
 
 
 
-    //(5) Method to Customize Product
+    //(4) Method to Customize Product
     public ResponsePojo<Product> customizeProduct(Long Id){
         Optional<Product> productOptional = productReppo.findById(Id);
         productOptional.orElseThrow(()->new ApiException(String.format("Product with this Id %s not found!", Id)));
@@ -154,7 +154,7 @@ public class ProductService2 {
         return responsePojo;
     }
 
-    //(6) Method to remove product
+    //(5) Method to remove product
     public void removeProduct(Long Id){
         Optional<Product> productOptional = productReppo.findById(Id);
         productOptional.orElseThrow(()-> new ApiException(String.format("Product with this Id %s not found!!", Id)));

@@ -19,29 +19,24 @@ public class ProductReviewApi {
     private ProductReviewService productReviewService;
 
     //Method to create review
+    //(1) Method to create a Product Transaction object
     @PostMapping("/initiateReview/{Id}")
     public ResponsePojo<ProductReview> createReview(@PathVariable Long Id, @RequestBody ProductReviewDto productRevDto){
         return productReviewService.createReview(Id, productRevDto);
     }
 
 
-        //(1) Method 1 to do ProductReview
+    //(2) Method 1 to do ProductReview
     @PutMapping("/rating/{Id}/{rate}")
     public ResponsePojo<ProductReview> updateRatings(@PathVariable Long Id,  @PathVariable Long rate, @RequestBody ProductReviewDto productRevDto) {
         return productReviewService.updateRatings(Id, rate, productRevDto);
     }
 
-    //(2) Method to List Top ranking products
+    //(3) Method to List Top ranking products
     @GetMapping("/topRankingProducts")
     public ResponsePojo<List<ProductReview>> topRankingProducts(){
         return productReviewService.topRankingProducts();
     }
-
-//    //(3) Method to get top products by a company
-//    @GetMapping("/topProductsByCompany/{companyName}")
-//    public ResponsePojo<List<ProductReview>> topProductsByCompany(@PathVariable  String companyName){
-//        return productReviewService.topProductsByCompany(companyName);
-//    }
 
     //(4) Method to get products by category
     @GetMapping("/getTrendingProducts")

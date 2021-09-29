@@ -25,23 +25,29 @@ public class ProductTransactionApi {
         return  productTransactionService.clientTransaction(Id, productTranDto);
     }
 
-    //(2) Method to get Ready-To-Ship Products
+    //(2) Method to conduct transaction
+    @PutMapping("/transact/{Id}/{amountPaid}")
+    public ResponsePojo< ProductTransaction> transactProduct(@PathVariable Long Id, @RequestBody ProductTransactionDto productTransactionDto, @PathVariable Long amountPaid ){
+        return productTransactionService.transactProduct(Id, productTransactionDto, amountPaid);
+    }
+
+
+    //(3) Method to get Ready-To-Ship Products
     @GetMapping("/readyToShipProducts")
     public ResponsePojo<List<ProductTransaction>> readyToShipProducts(){
         return productTransactionService.readyToShipProducts();
     }
 
-    //(3) Method to get Weekly Deals
+    //(4) Method to get Weekly Deals
     @GetMapping("/weeklyDeals")
     public ResponsePojo<List<ProductTransaction>> weeklyDeals(){
         return productTransactionService.weeklyDeals();
     }
 
-    //(4) Method to get small Commodities products
+    //(5) Method to get small Commodities products
     @GetMapping("/lowPriceCommodity")
     public ResponsePojo<List<ProductTransaction>> lowPriceCommodities(){
         return productTransactionService.lowPriceCommodities();
     }
-
 
 }

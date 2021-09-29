@@ -34,12 +34,16 @@ public class ProductTransactionService {
     private EntityManager entityManager;
 
     //(1) The methods stated here are to engage, input and increment certain features of the Product table
-    public ResponsePojo<ProductTransaction> clientTransaction(Long Id, ProductTransactionDto productTranDto){
+    public ResponsePojo<ProductTransaction> clientTransaction(Long Id, ProductTransactionDto productTranDto) {
 
-        if(ObjectUtils.isEmpty(Id))
+        if (ObjectUtils.isEmpty(Id))
             throw new ApiException("Id empty...insert Id");
         Optional<Product> productOptional1 = productReppo.findById(Id);
-        productOptional1.orElseThrow(()->new ApiException(String.format("Product with Id %s not found!", Id)));
+        productOptional1.orElseThrow(() -> new ApiException(String.format("Product with Id %s not found!", Id)));
+
+        Optional<ProductTransaction> prodTranOptional = productTransactionReppo.findById(Id);
+       if( prodTranOptional.isPresent())
+           throw new ApiException("Id can not be created twice!!");
 
 
         ProductTransaction productTran = new ProductTransaction();
@@ -49,48 +53,87 @@ public class ProductTransactionService {
         productTran.setProductNumber(productOptional1.get().getProductNumber());
         productTran.setPrice(productOptional1.get().getPrice());
         productTran.setQuantityOrdered(productTranDto.getQuantityOrdered());
-        productTran.setDiscount(productOptional1.get().getDiscount());
+        productTran.setDiscount(productTranDto.getDiscount());
         productTran.setShippingCost(productTranDto.getShippingCost());
+        productTran.setTotalCost(productTranDto.getTotalCost());
+        productTran.setSaleStatus(false);
+
+        //productTran.setTransactionNumber(new Date().getTime());
+        // productTran.setProcessingTime("4 Work Days");
         productTran.setCompanyName(productTranDto.getCompanyName());
         productTran.setSupplierContact(productTranDto.getSupplierContact());
         productTran.setCountry(productTranDto.getCountry());
 
-        Long amountPaid = productTranDto.getPrice();
-        Long costPrice = productTran.getPrice();
-
-        if( amountPaid<costPrice)
-            throw new ApiException("This transaction is cancelled!!");
-
-        //Calculation to get total cost
-        Long disCountPrice = costPrice - ((productOptional1.get().getDiscount()) * costPrice/100);
-
-
-        productTran.setTotalCost((disCountPrice * productTranDto.getQuantityOrdered()) + productTran.getShippingCost());
-        productTran.setSaleStatus(true);
-
-        //If user paid for shipping
-        if(productTran.getShippingCost()!=0)
-            productTran.setShippingStatus(true);
-
-        productTran.setDateSold(new Date());
-        productTran.setTransactionNumber(new Date().getTime());
-        productTran.setProcessingTime(productTranDto.getProcessingTime());
-
-
         productTransactionReppo.save(productTran);
-
 
         ResponsePojo<ProductTransaction> responsePojo = new ResponsePojo<>();
         responsePojo.setData(productTran);
-        responsePojo.setMessage("Transaction successful!");
+        responsePojo.setMessage("Transaction initiated successfully!");
 
+
+        return responsePojo;
+    }
+
+    //(2) Method to conduct transaction
+    public ResponsePojo< ProductTransaction> transactProduct(Long Id, ProductTransactionDto productTransactionDto, Long amountPaid ){
+
+        Optional<Product> prod = productReppo.findById(Id);
+        prod.orElseThrow(()-> new ApiException("Product with this Id not found on Product wall!!"));
+        Product product= prod.get();
+
+        Optional<ProductTransaction> productTransaction = productTransactionReppo.findById(Id);
+        productTransaction.orElseThrow(()->new ApiException("Id does not exist on ProductTransaction wall!!"));
+        ProductTransaction prodTrans = productTransaction.get();
+
+        Long costPrice = product.getPrice();
+
+        if(amountPaid<costPrice)
+            throw new ApiException("This transaction is cancelled!!");
+
+
+        prodTrans.setProductName(product.getProductName());
+        prodTrans.setProductNumber(product.getProductNumber());
+        prodTrans.setPrice(product.getPrice());
+        prodTrans.setQuantityOrdered(productTransactionDto.getQuantityOrdered());
+        prodTrans.setDiscount(productTransactionDto.getDiscount());
+        prodTrans.setShippingCost(productTransactionDto.getShippingCost());
+        prodTrans.setTotalCost(productTransactionDto.getTotalCost());
+        prodTrans.setSaleStatus(false);
+        prodTrans.setCompanyName(productTransactionDto.getCompanyName());
+        prodTrans.setSupplierContact(productTransactionDto.getSupplierContact());
+        prodTrans.setCountry(productTransactionDto.getCountry());
+
+        //Mathematical calculations of Total cost and amount to pay
+        Long productDiscount = (product.getDiscount());
+        Long quantityOrder =productTransactionDto.getQuantityOrdered();
+        Long shippingCost = productTransactionDto.getShippingCost();
+        //Calculation to get total cost
+        Long disCountPrice = costPrice - (productDiscount * costPrice/100);
+
+
+        prodTrans.setTotalCost((disCountPrice * quantityOrder ));
+        prodTrans.setSaleStatus(true);
+        productTransactionReppo.save(prodTrans);
+
+        //If user paid for shipping
+        prodTrans.setShippingStatus(true);
+
+        prodTrans.setDateSold(new Date());
+        prodTrans.setTransactionNumber(new Date().getTime());
+        prodTrans.setProcessingTime(productTransactionDto.getProcessingTime());
+
+        productTransactionReppo.save(prodTrans);
+
+        ResponsePojo<ProductTransaction> responsePojo = new ResponsePojo<>();
+        responsePojo.setData(prodTrans);
+        responsePojo.setMessage("Transaction successful!");
 
         return responsePojo;
     }
 
 
 
-    //(2) Method to get Ready-To-Ship Products
+    //(3) Method to get Ready-To-Ship Products
     public ResponsePojo<List<ProductTransaction>> readyToShipProducts(){
         QProductTransaction qProductTransaction = QProductTransaction.productTransaction;
         //BooleanBuilder predicate = new BooleanBuilder();
@@ -109,7 +152,7 @@ public class ProductTransactionService {
         return responsePojo;
     }
 
-    //(3) Method to get Weekly Deals
+    //(4) Method to get Weekly Deals
     public ResponsePojo<List<ProductTransaction>> weeklyDeals(){
         QProductTransaction qProductTransaction = QProductTransaction.productTransaction;
         //BooleanBuilder predicate = new BooleanBuilder();
@@ -128,15 +171,15 @@ public class ProductTransactionService {
         return responsePojo;
     }
 
-    //(4) Method to get small Commodities products
+    //(5) Method to get small Commodities products
     public ResponsePojo<List<ProductTransaction>> lowPriceCommodities(){
         QProductTransaction qProductTransaction = QProductTransaction.productTransaction;
         //BooleanBuilder predicate = new BooleanBuilder();
 
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
         JPAQuery<ProductTransaction> jpaQuery = jpaQueryFactory.selectFrom(qProductTransaction)
-                .where(qProductTransaction.quantityOrdered.between(1, 10).and(qProductTransaction.price.between(100,300)))
-                .orderBy(qProductTransaction.saleStatus.asc());
+                .where(qProductTransaction.quantityOrdered.between(1, 200).and(qProductTransaction.price.between(100,1000)))
+                .orderBy(qProductTransaction.price.asc());
 
         List<ProductTransaction> productList = jpaQuery.fetch();
 

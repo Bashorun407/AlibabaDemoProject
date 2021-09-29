@@ -143,27 +143,6 @@ public class ProductReviewService {
         return responsePojo;
     }
 
-//    //(3) Method to get top products by a company
-//    public ResponsePojo<List<ProductReview>> topProductsByCompany(String companyName){
-//        QProductReview qProductReview = QProductReview.productReview;
-//        BooleanBuilder predicate = new BooleanBuilder();
-//
-//        if(StringUtils.hasText(companyName))
-//            predicate.and(qProductReview.companyName.likeIgnoreCase("%" + companyName + "%"));
-//
-//        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-//        JPAQuery<ProductReview> jpaQuery = jpaQueryFactory.selectFrom(qProductReview)
-//                .where(predicate.and(qProductReview.numberOfReviews.gt(30)))
-//                .orderBy(qProductReview.Id.desc());
-//
-//        List<ProductReview> productList = jpaQuery.fetch();
-//
-//        ResponsePojo<List<ProductReview>> responsePojo = new ResponsePojo<>();
-//        responsePojo.setData(productList);
-//        responsePojo.setMessage("Top Products by Company");
-//
-//        return responsePojo;
-//    }
 
     //(4) Method to get products by category
     public ResponsePojo<List<ProductReview>> getTrendingProducts(){
