@@ -25,7 +25,7 @@ public class EmailReceiver {
     private String senderLastName;
 
     @Column(name = "Email_Number")
-    private String emailNumber;
+    private Long emailNumber;
 
     @Column(name = "Email_Title")
     private String emailHeader;

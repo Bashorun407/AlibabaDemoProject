@@ -15,7 +15,7 @@ public class EmailReceiverDao {
 
     private String senderLastName;
 
-    private String emailNumber;
+    private Long emailNumber;
 
     private String emailHeader;
 

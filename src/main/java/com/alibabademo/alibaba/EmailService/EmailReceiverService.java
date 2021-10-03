@@ -2,9 +2,7 @@ package com.alibabademo.alibaba.EmailService;
 
 import com.alibabademo.alibaba.EmailDao.EmailReceiverDao;
 import com.alibabademo.alibaba.EmailEntity.EmailReceiver;
-import com.alibabademo.alibaba.EmailEntity.EmailSender;
 import com.alibabademo.alibaba.EmailEntity.QEmailReceiver;
-import com.alibabademo.alibaba.EmailEntity.QEmailSender;
 import com.alibabademo.alibaba.EmailReppo.EmailReceiverReppo;
 import com.alibabademo.alibaba.Exception.ApiException;
 import com.alibabademo.alibaba.RestResponse.ResponsePojo;
@@ -12,9 +10,10 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
-import java.awt.desktop.OpenFilesEvent;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +30,19 @@ public class EmailReceiverService {
     //(1) Method to save incoming mails
     public ResponsePojo<EmailReceiver> saveEmail(EmailReceiverDao emailReceiverDao){
 
+        String senderMail = emailReceiverDao.getSenderEmail();
+        Long mailNumber = emailReceiverDao.getEmailNumber();
+
+        //To check that the source of the mail is valid
+        if(!StringUtils.hasText(senderMail))
+            throw new ApiException("The sender of the mail is null...invalid mail!!");
+
+        if(ObjectUtils.isEmpty(mailNumber))
+            throw new ApiException("The mail does not have an identifier...invalid mail!!");
+
+        //This is where the database receives the mail
         EmailReceiver emailReceiver = new EmailReceiver();
+
         emailReceiver.setSenderEmail(emailReceiverDao.getSenderEmail());
         emailReceiver.setSenderFirstName(emailReceiverDao.getSenderFirstName());
         emailReceiver.setSenderLastName(emailReceiverDao.getSenderLastName());
@@ -44,6 +55,7 @@ public class EmailReceiverService {
         emailReceiver.setDeleteStatus(false);
         emailReceiver.setImportant(false);
 
+        //The mail is saved
         emailReceiverReppo.save(emailReceiver);
 
         //Response POJO
@@ -82,6 +94,7 @@ public class EmailReceiverService {
 
         EmailReceiver mail = emailReceiverOptional.get();
         mail.setDeleteStatus(true);
+        mail.setImportant(false);
         emailReceiverReppo.save(mail);
 
         //Response POJO
@@ -151,6 +164,5 @@ public class EmailReceiverService {
         responsePojo.setMessage("List of Emails From Bin Found!");
 
         return responsePojo;
-
     }
 }

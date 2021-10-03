@@ -12,6 +12,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import java.util.Date;
@@ -29,6 +30,20 @@ public class EmailSenderService {
 
     //(1) Method to Compose mail
     public ResponsePojo<EmailSender> composeEmail(EmailSenderDao emailSenderDao){
+
+        //To check that there is a valid receiver, sender and a mail content
+        String receiver = emailSenderDao.getReceiverEmail();
+        String sender = emailSenderDao.getSenderEmail();
+        String body = emailSenderDao.getEmailBody();
+
+        if(!StringUtils.hasText(receiver))
+            throw new ApiException("Mail has no receiver mail address...mail is invalid!!");
+
+        if(!StringUtils.hasText(sender))
+            throw new ApiException("Mail has no sender mail address...mail is invalid!!");
+
+        if(!StringUtils.hasText(body))
+            throw new ApiException("Mail has no message body or content....mail is invalid!!");
 
         EmailSender newMail = new EmailSender();
         newMail.setReceiverEmail(emailSenderDao.getReceiverEmail());
@@ -55,9 +70,9 @@ public class EmailSenderService {
     }
 
     //(2) Method to update mail
-    public ResponsePojo<EmailSender> updateMail(EmailSenderDao emailSenderDao){
+    public ResponsePojo<EmailSender> updateMail(Long Id,EmailSenderDao emailSenderDao){
 
-        Optional<EmailSender> emailSenderOptional1 = emailSenderReppo.findById(emailSenderDao.getId());
+        Optional<EmailSender> emailSenderOptional1 = emailSenderReppo.findById(Id);
         emailSenderOptional1.orElseThrow(()->new ApiException("There is no mail with this ID!!"));
 
         Optional<EmailSender> emailSenderOptional2 = emailSenderReppo.findByEmailNumber(emailSenderDao.getEmailNumber());
@@ -116,6 +131,7 @@ public class EmailSenderService {
 
        //After mail is verified, the following conditions will be set
         email1.setSentStatus(true);
+        email1.setDraftStatus(false);
         email1.setDateSent(new Date());
 
         //To save a copy to the repository
@@ -170,7 +186,7 @@ public class EmailSenderService {
     }
 
     //(6) Method to get emails saved as draft
-    public ResponsePojo<List<EmailSender>> getDraftedMails(){
+    public ResponsePojo<List<EmailSender>> getDraftMails(){
         QEmailSender qEmailSender = QEmailSender.emailSender;
         // BooleanBuilder predicate = new BooleanBuilder();
 
