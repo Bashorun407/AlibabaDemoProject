@@ -37,6 +37,11 @@ public class EmailReceiverService {
         if(!StringUtils.hasText(senderMail))
             throw new ApiException("The sender of the mail is null...invalid mail!!");
 
+        //To check that the email of the sender is in the right form
+        if(!StringUtils.endsWithIgnoreCase(emailReceiverDao.getSenderEmail(), "@gmail.com"))
+            throw new ApiException("The sender email is not valid!!");
+
+        //To check that the incoming mail has a unique identifier
         if(ObjectUtils.isEmpty(mailNumber))
             throw new ApiException("The mail does not have an identifier...invalid mail!!");
 

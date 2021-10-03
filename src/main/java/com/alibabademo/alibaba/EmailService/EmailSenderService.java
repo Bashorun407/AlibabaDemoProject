@@ -2,12 +2,10 @@ package com.alibabademo.alibaba.EmailService;
 
 import com.alibabademo.alibaba.EmailDao.EmailSenderDao;
 import com.alibabademo.alibaba.EmailEntity.EmailSender;
-import com.alibabademo.alibaba.EmailEntity.QEmailReceiver;
 import com.alibabademo.alibaba.EmailEntity.QEmailSender;
 import com.alibabademo.alibaba.EmailReppo.EmailSenderReppo;
 import com.alibabademo.alibaba.Exception.ApiException;
 import com.alibabademo.alibaba.RestResponse.ResponsePojo;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,17 +34,29 @@ public class EmailSenderService {
         String sender = emailSenderDao.getSenderEmail();
         String body = emailSenderDao.getEmailBody();
 
+        //To check that receiver mail address is given
         if(!StringUtils.hasText(receiver))
             throw new ApiException("Mail has no receiver mail address...mail is invalid!!");
 
+        //To check that a valid email address is given
+        if(!StringUtils.endsWithIgnoreCase(receiver, "@gmail.com"))
+            throw new ApiException(String.format("This mail address %s is not valid", receiver));
+
+        //To check that sender mail address is given
         if(!StringUtils.hasText(sender))
             throw new ApiException("Mail has no sender mail address...mail is invalid!!");
+
+        //To check that valid sender mail is given
+        if(!StringUtils.endsWithIgnoreCase(receiver, "@gmail.com"))
+            throw new ApiException(String.format("This mail address %s is not valid", sender));
+
 
         if(!StringUtils.hasText(body))
             throw new ApiException("Mail has no message body or content....mail is invalid!!");
 
         EmailSender newMail = new EmailSender();
-        newMail.setReceiverEmail(emailSenderDao.getReceiverEmail());
+        //To check that the email received is in lower case
+        newMail.setReceiverEmail(String.format(emailSenderDao.getReceiverEmail(), emailSenderDao.getSenderEmail()).toLowerCase());
         newMail.setEmailNumber(new Date().getTime());
         newMail.setEmailHeader(emailSenderDao.getEmailHeader());
         newMail.setEmailBody(emailSenderDao.getEmailBody());
@@ -55,7 +65,7 @@ public class EmailSenderService {
         newMail.setDeleteStatus(false);
         newMail.setSenderFirstName(emailSenderDao.getSenderFirstName());
         newMail.setSenderLastName(emailSenderDao.getSenderLastName());
-        newMail.setSenderEmail(emailSenderDao.getSenderEmail());
+        newMail.setSenderEmail(String.format(emailSenderDao.getSenderEmail(), emailSenderDao.getSenderEmail()).toLowerCase());
 
         //saving the Email Details
         emailSenderReppo.save(newMail);
