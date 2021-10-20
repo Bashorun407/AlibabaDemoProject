@@ -66,7 +66,7 @@ public class ShopOwnerService {
 
 
 
-    //(2) Writing Headers in the new sheet.
+    //(2) Writing Excel Data using FOR LOOP.
     public void writeExcelData() throws IOException {
 
         //File Location
@@ -172,7 +172,5 @@ public class ShopOwnerService {
         workbook.write(outputStream);
         workbook.close();
     }
-
-
 
 }
