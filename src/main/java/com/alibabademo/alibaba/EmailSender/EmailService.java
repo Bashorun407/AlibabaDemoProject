@@ -1,6 +1,6 @@
 package com.alibabademo.alibaba.EmailSender;
 
-import com.alibabademo.alibaba.EmailReppo.EmailSenderReppo;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
