@@ -2,6 +2,7 @@ package com.alibabademo.alibaba.ExcelWriter;
 
 import com.alibabademo.alibaba.Entity.ShopOwners;
 import com.alibabademo.alibaba.Exception.ApiException;
+import com.alibabademo.alibaba.Exception.ApiRequestException;
 import com.alibabademo.alibaba.Repository.ShopOwnerReppo;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -31,7 +32,7 @@ public class ExcelFileWriter {
             String filePath = "C:\\Users\\Akinbobola Oluwaseyi\\Desktop\\alibaba\\src\\main\\java\\com\\alibabademo\\alibaba\\ExcelData\\ShopOwners.xlsx";
 
             if(!StringUtils.hasText(filePath))
-                throw new ApiException("File Path is invalid!!");
+                throw new ApiRequestException("File Path is invalid!!");
 
 
             FileOutputStream outputStream = new FileOutputStream(filePath);

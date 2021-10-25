@@ -3,6 +3,7 @@ package com.alibabademo.alibaba.Service;
 import com.alibabademo.alibaba.Dao.ProductReviewDto;
 import com.alibabademo.alibaba.Entity.*;
 import com.alibabademo.alibaba.Exception.ApiException;
+import com.alibabademo.alibaba.Exception.ApiRequestException;
 import com.alibabademo.alibaba.Repository.ProductReppo;
 import com.alibabademo.alibaba.Repository.ProductReviewReppo;
 import com.alibabademo.alibaba.RestResponse.ResponsePojo;
@@ -37,11 +38,11 @@ public class ProductReviewService {
 
         //To verify that 'empty' or 'null' values are not entered into the database
         if(ObjectUtils.isEmpty(Id))
-            throw new ApiException("Id is needed to rate this product!!");
+            throw new ApiRequestException("Id is needed to rate this product!!");
 
         //Introducing ProductReppo to verify information entered
         Optional<Product> productOptional1 = productReppo.findById(Id);
-        productOptional1.orElseThrow(()->new ApiException(String.format("Product with this Id %s, not found!", Id)));
+        productOptional1.orElseThrow(()->new ApiRequestException(String.format("Product with this Id %s, not found!", Id)));
 
         ProductReview productRev = new ProductReview();
         //The following information were collected from the Product Database
@@ -73,14 +74,14 @@ public class ProductReviewService {
 
         //To verify that 'empty' or 'null' values are not entered into the database
         if(ObjectUtils.isEmpty(Id))
-            throw new ApiException("Id is needed to rate this product!!");
+            throw new ApiRequestException("Id is needed to rate this product!!");
 
         if(!(rating>=1 && rating<=5))
-            throw new ApiException("rating must be from 1 to 5!!");
+            throw new ApiRequestException("rating must be from 1 to 5!!");
 
         //Introducing ProductReppo to verify information entered
         Optional<ProductReview> productReviewOptional1 = productReviewReppo.findById(Id);
-        productReviewOptional1.orElseThrow(()->new ApiException(String.format("Product with this Id %s, not found!", Id)));
+        productReviewOptional1.orElseThrow(()->new ApiRequestException(String.format("Product with this Id %s, not found!", Id)));
 
         //The following retrieves the data needed from the Product database
         ProductReview productRev = productReviewOptional1.get();
@@ -170,10 +171,10 @@ public class ProductReviewService {
     public ResponsePojo<ProductReview> getUsersComment(Long Id, ProductReviewDto productReviewDto ){
 
         if(ObjectUtils.isEmpty(Id))
-            throw new ApiException("Id is needed for review");
+            throw new ApiRequestException("Id is needed for review");
 
         Optional<ProductReview> productReviewOptional = productReviewReppo.findById(Id);
-        productReviewOptional.orElseThrow(()->new ApiException(String.format("Product with this Id %s does not exist", Id)));
+        productReviewOptional.orElseThrow(()->new ApiRequestException(String.format("Product with this Id %s does not exist", Id)));
 
         ProductReview productRev = productReviewOptional.get();
 

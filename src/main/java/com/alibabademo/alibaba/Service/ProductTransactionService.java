@@ -5,6 +5,7 @@ import com.alibabademo.alibaba.Entity.Product;
 import com.alibabademo.alibaba.Entity.ProductTransaction;
 import com.alibabademo.alibaba.Entity.QProductTransaction;
 import com.alibabademo.alibaba.Exception.ApiException;
+import com.alibabademo.alibaba.Exception.ApiRequestException;
 import com.alibabademo.alibaba.Repository.ProductReppo;
 import com.alibabademo.alibaba.Repository.ProductTransactionReppo;
 import com.alibabademo.alibaba.RestResponse.ResponsePojo;
@@ -37,13 +38,13 @@ public class ProductTransactionService {
     public ResponsePojo<ProductTransaction> clientTransaction(Long Id, ProductTransactionDto productTranDto) {
 
         if (ObjectUtils.isEmpty(Id))
-            throw new ApiException("Id empty...insert Id");
+            throw new ApiRequestException("Id empty...insert Id");
         Optional<Product> productOptional1 = productReppo.findById(Id);
-        productOptional1.orElseThrow(() -> new ApiException(String.format("Product with Id %s not found!", Id)));
+        productOptional1.orElseThrow(() -> new ApiRequestException(String.format("Product with Id %s not found!", Id)));
 
         Optional<ProductTransaction> prodTranOptional = productTransactionReppo.findById(Id);
        if( prodTranOptional.isPresent())
-           throw new ApiException("Id can not be created twice!!");
+           throw new ApiRequestException("Id can not be created twice!!");
 
 
         ProductTransaction productTran = new ProductTransaction();
@@ -78,17 +79,17 @@ public class ProductTransactionService {
     public ResponsePojo< ProductTransaction> transactProduct(Long Id, ProductTransactionDto productTransactionDto, Long amountPaid ){
 
         Optional<Product> prod = productReppo.findById(Id);
-        prod.orElseThrow(()-> new ApiException("Product with this Id not found on Product wall!!"));
+        prod.orElseThrow(()-> new ApiRequestException("Product with this Id not found on Product wall!!"));
         Product product= prod.get();
 
         Optional<ProductTransaction> productTransaction = productTransactionReppo.findById(Id);
-        productTransaction.orElseThrow(()->new ApiException("Id does not exist on ProductTransaction wall!!"));
+        productTransaction.orElseThrow(()->new ApiRequestException("Id does not exist on ProductTransaction wall!!"));
         ProductTransaction prodTrans = productTransaction.get();
 
         Long costPrice = product.getPrice();
 
         if(amountPaid<costPrice)
-            throw new ApiException("This transaction is cancelled!!");
+            throw new ApiRequestException("This transaction is cancelled!!");
 
 
         prodTrans.setProductName(product.getProductName());

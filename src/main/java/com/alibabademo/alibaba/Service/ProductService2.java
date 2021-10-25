@@ -4,6 +4,7 @@ import com.alibabademo.alibaba.Dao.ProductDto;
 import com.alibabademo.alibaba.Entity.Product;
 import com.alibabademo.alibaba.Entity.QProduct;
 import com.alibabademo.alibaba.Exception.ApiException;
+import com.alibabademo.alibaba.Exception.ApiRequestException;
 import com.alibabademo.alibaba.Repository.ProductReppo;
 import com.alibabademo.alibaba.RestResponse.ResponsePojo;
 import com.querydsl.core.BooleanBuilder;
@@ -34,7 +35,7 @@ public class ProductService2 {
     public ResponsePojo<Product> createProduct(ProductDto productDto){
 
         if(!StringUtils.hasText(productDto.getProductName()))
-            throw new ApiException("Product name is required to create product!!");
+            throw new ApiRequestException("Product name is required to create product!!");
 
 //        Optional<Product>  productOptional = productReppo.findById(productDto.getId());
 //        productOptional.orElseThrow(()->new ApiException(String.format("The product with this id: %s exists!!", productDto.getId())));
@@ -66,16 +67,16 @@ public class ProductService2 {
     public ResponsePojo<Product> productUpdate(Long Id, ProductDto productDto){
 
         if(ObjectUtils.isEmpty(Id))
-            throw new ApiException("Product Id is empty!! Enter Id");
+            throw new ApiRequestException("Product Id is empty!! Enter Id");
 
         if(ObjectUtils.isEmpty(productDto.getProductNumber()))
-            throw new ApiException("Product number is required for update!!");
+            throw new ApiRequestException("Product number is required for update!!");
 
         Optional<Product> productOptional1 = productReppo.findById(Id);
-        productOptional1.orElseThrow(()-> new ApiException(String.format("Product with this Id %s not found!!", Id)));
+        productOptional1.orElseThrow(()-> new ApiRequestException(String.format("Product with this Id %s not found!!", Id)));
 
         Optional<Product> productOptional2 = productReppo.findByProductNumber(productDto.getProductNumber());
-        productOptional2.orElseThrow(()-> new ApiException(String.format("Product with this product-number %s not found!!",
+        productOptional2.orElseThrow(()-> new ApiRequestException(String.format("Product with this product-number %s not found!!",
                 productDto.getProductNumber())));
 
         //To check that it is the same's product's Id and productNumber
@@ -83,7 +84,7 @@ public class ProductService2 {
         Product product2 = productOptional2.get();
 
         if(product1 != product2)
-            throw new ApiException("The product Id and product number entered are for different products!!");
+            throw new ApiRequestException("The product Id and product number entered are for different products!!");
 
         //Now the update begins
         Product product = productOptional1.get();
@@ -142,7 +143,7 @@ public class ProductService2 {
     //(4) Method to Customize Product
     public ResponsePojo<Product> customizeProduct(Long Id){
         Optional<Product> productOptional = productReppo.findById(Id);
-        productOptional.orElseThrow(()->new ApiException(String.format("Product with this Id %s not found!", Id)));
+        productOptional.orElseThrow(()->new ApiRequestException(String.format("Product with this Id %s not found!", Id)));
         Product product = productOptional.get();
         product.setCustomized(true);
 
@@ -157,7 +158,7 @@ public class ProductService2 {
     //(5) Method to remove product
     public void removeProduct(Long Id){
         Optional<Product> productOptional = productReppo.findById(Id);
-        productOptional.orElseThrow(()-> new ApiException(String.format("Product with this Id %s not found!!", Id)));
+        productOptional.orElseThrow(()-> new ApiRequestException(String.format("Product with this Id %s not found!!", Id)));
 
         productReppo.deleteById(Id);
     }

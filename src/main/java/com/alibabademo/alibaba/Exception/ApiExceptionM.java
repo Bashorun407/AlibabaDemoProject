@@ -10,16 +10,16 @@ import java.time.ZonedDateTime;
 public class ApiExceptionM {
 
     private final String message;
-    private final Throwable throwable;
+    //private final Throwable throwable;
     private final HttpStatus httpStatus;
-    private final ZonedDateTime zonedDateTime;
+    private final ZonedDateTime timeStamp;
 
     //Generating Class Constructor
 
-    public ApiExceptionM(String message, Throwable throwable, HttpStatus httpStatus, ZonedDateTime zonedDateTime) {
+    public ApiExceptionM(String message, Throwable throwable, HttpStatus httpStatus, ZonedDateTime timeStamp) {
         this.message = message;
-        this.throwable = throwable;
+       // this.throwable = throwable;
         this.httpStatus = httpStatus;
-        this.zonedDateTime = zonedDateTime;
+        this.timeStamp = timeStamp;
     }
 }

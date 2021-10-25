@@ -5,6 +5,7 @@ import com.alibabademo.alibaba.Entity.Product;
 import com.alibabademo.alibaba.Entity.QProduct;
 import com.alibabademo.alibaba.Entity.QProductTransaction;
 import com.alibabademo.alibaba.Exception.ApiException;
+import com.alibabademo.alibaba.Exception.ApiRequestException;
 import com.alibabademo.alibaba.Repository.ProductReppo;
 import com.alibabademo.alibaba.RestResponse.ResponsePojo;
 import com.querydsl.core.BooleanBuilder;
@@ -34,10 +35,10 @@ public class ProductService {
     //(1) Method to get product by Id
     public ResponsePojo<Product> getProductById(Long Id){
         if(ObjectUtils.isEmpty(Id))
-            throw new ApiException("Id is empty...insert Id");
+            throw new ApiRequestException("Id is empty...insert Id");
 
         Optional<Product> productOptional1= productReppo.findById(Id);
-        productOptional1.orElseThrow(()->new ApiException(String.format("Product with Id %s does not exist", Id )));
+        productOptional1.orElseThrow(()->new ApiRequestException(String.format("Product with Id %s does not exist", Id )));
 
         Product product = productOptional1.get();
         ResponsePojo<Product> responsePojo = new ResponsePojo<>();
@@ -52,7 +53,7 @@ public class ProductService {
         List<Product> productList = productReppo.findAll();
 
         if(productList.isEmpty())
-            throw new ApiException("List is empty!!");
+            throw new ApiRequestException("List is empty!!");
 
         ResponsePojo<List<Product>> responsePojo = new ResponsePojo<>();
         responsePojo.setData(productList);

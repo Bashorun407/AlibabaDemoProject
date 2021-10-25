@@ -45,7 +45,7 @@ public class ShopOwnersService {
             throw new ApiRequestException("Shop name is required to create Shop!!");
 
         if(!StringUtils.hasText(shopOwnersDto.getShopNumber()))
-            throw new ApiException("Shop number is required to create Shop!!");
+            throw new ApiRequestException("Shop number is required to create Shop!!");
 
         ShopOwners shopOwners = new ShopOwners();
 
@@ -104,7 +104,7 @@ public class ShopOwnersService {
         List<ShopOwners> shopOwnerSearched = jpaQuery.fetch();
 
        if(shopOwnerSearched.isEmpty())
-              throw new ApiException("Shop with this Detail does not exist.");
+              throw new ApiRequestException("Shop with this Detail does not exist.");
 
         ResponsePojo<List<ShopOwners>> responsePojo = new ResponsePojo<>();
         responsePojo.setData(shopOwnerSearched);
@@ -117,16 +117,16 @@ public class ShopOwnersService {
     public ResponsePojo<ShopOwners> updateShopOwner(ShopOwnersDto shopOwnersDto){
 
         Optional<ShopOwners> shopOwnersOptional1 = shopOwnerReppo.findByShopNumber(shopOwnersDto.getShopNumber());
-        shopOwnersOptional1.orElseThrow(()-> new ApiException("Shop with this Shop Number does not exist."));
+        shopOwnersOptional1.orElseThrow(()-> new ApiRequestException("Shop with this Shop Number does not exist."));
 
         Optional<ShopOwners> shopOwnersOptional2 = shopOwnerReppo.findByShopName(shopOwnersDto.getShopName());
-        shopOwnersOptional2.orElseThrow(()-> new ApiException("Shop with this Shop Name does not exist."));
+        shopOwnersOptional2.orElseThrow(()-> new ApiRequestException("Shop with this Shop Name does not exist."));
 
         ShopOwners shopOwners1 = shopOwnersOptional1.get();
         ShopOwners shopOwners2 = shopOwnersOptional2.get();
 
         if( shopOwners1 == shopOwners2)
-            throw new ApiException("The Shop Number and Shop Name entered are for different Shop Owners");
+            throw new ApiRequestException("The Shop Number and Shop Name entered are for different Shop Owners");
 
         ShopOwners shopOwners = shopOwnersOptional1.get();
         shopOwners.setShopName(shopOwnersDto.getShopName());
