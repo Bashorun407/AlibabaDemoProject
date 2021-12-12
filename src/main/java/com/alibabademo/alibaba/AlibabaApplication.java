@@ -1,3 +1,4 @@
+/*
 package com.alibabademo.alibaba;
 
 import com.alibabademo.alibaba.EmailSender.EmailService;
@@ -43,3 +44,5 @@ public class AlibabaApplication {
 
 
 }
+
+ */
