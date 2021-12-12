@@ -27,7 +27,7 @@ public class ExcelFileWriter {
             //List of Shop Owners in the database
             List<ShopOwners> shopOwnersList = shopOwnerReppo.findAll();
 
-            String filePath = "C:\\Users\\Akinbobola Oluwaseyi\\Desktop\\alibaba\\src\\main\\java\\com\\alibabademo\\alibaba\\ExcelData\\ShopOwners.xlsx";
+            String filePath = "C:\\Users\\Akinbobola Oluwaseyi\\Desktop\\Java Projects\\alibaba\\service\\src\\main\\java\\com\\alibaba\\service\\ExcelWriter\\ShopOwners.xlsx";
 
             if(!StringUtils.hasText(filePath))
                 throw new ApiRequestException("File Path is invalid!!");

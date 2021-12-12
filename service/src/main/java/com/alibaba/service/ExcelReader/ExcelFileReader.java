@@ -20,7 +20,7 @@ public class ExcelFileReader {
     }
 
     //To create the Path to the Excel data
-    String filePath = "C:\\Users\\Akinbobola Oluwaseyi\\Desktop\\alibaba\\src\\main\\java\\com\\alibabademo\\alibaba\\ExcelData\\Data1.xlsx";
+    String filePath = "C:\\Users\\Akinbobola Oluwaseyi\\Desktop\\Java Projects\\alibaba\\service\\src\\main\\java\\com\\alibaba\\service\\ExcelReader\\Data1.xlsx";
 
     //using FILE INPUT STREAM to read the data in the file path
     FileInputStream inputStream = new FileInputStream(filePath);
